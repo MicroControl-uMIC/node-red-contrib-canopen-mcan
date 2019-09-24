@@ -14,6 +14,7 @@
   "node-red": {
     "nodes": {
       "mcan-4ai": "canopen/mcan-4ai.js",
+      "mcan-4ao": "canopen/mcan-4ao.js",
       "mcan-4ti": "canopen/mcan-4ti.js"
     }
   },

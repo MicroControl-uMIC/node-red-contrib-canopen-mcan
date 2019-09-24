@@ -1,0 +1,186 @@
+<!-- for detailed information: https://nodered.org/docs/creating-nodes/node-html -->
+
+<script type="text/javascript">
+    RED.nodes.registerType('mcan-4ao',{
+        category: 'CANopen',
+        color: '#e69e39',
+        defaults: {
+            nodeID: {value: ""},
+            artikelNr: {value: "12.43.005"},
+            sensorType: {value: ""},
+            checkCh: {value: ""},
+            canCh: {value: ""},
+            name: {value: "µCAN.4.ao"}
+        },
+        oneditprepare: function() {
+            $('.editor-tray-content').css({"width" : 400 +  "px"});
+        },
+        inputs:1,
+        inputLabels: ["Input"],
+        icon: "font-awesome/sign-out",
+        align: 'right',
+        label: function() {
+	    return this.name || "µCAN.4.ao";}
+    });
+</script>
+
+<script type="text/x-red" data-template-name="mcan-4ao">
+
+    <p align="left"><strong>µCAN.4.ao-BOX </strong></p>
+
+    <img src="/node-red-contrib-canopen-mcan/icons/mcan-4xi.png" alt="µCAN.4.ai" style="width:257px;height:208px;align="middle">
+
+    <div class="form-row">
+        <label for="node-input-name">Name : </label>
+        <input type="text" id="node-input-name" style="width:200px; display:inline-block"> 
+    </div>
+
+    
+    <div class="form-row">
+        <label for="node-input-canCh">CAN Kanal : </label>
+        <select type="text" id="node-input-canCh" style="width:200px; display:inline-block">
+            <option>CAN 1</option>
+            <option>CAN 2</option>
+       </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-nodeID">Node-ID </label>
+        <input type="number" id="node-input-nodeID" style="width:200px; display:inline-block" max="127" min="1"> 
+    </div>
+
+	 <div class="mcan-input">
+    <p align="left" style="margin-left:70px">Select input channel</p>
+
+    <div class="form-row">
+        <label for="node-input-checkCh"><i class="fa fa-thermometer-quarter"></i>Channel</label>
+        <select type="text" id="node-input-checkCh" style="width:200px; display:inline-block">
+            <option>keine Auswahl</option>
+            <option>Kanal 1</option>
+            <option>Kanal 2</option>
+            <option>Kanal 3</option>
+            <option>Kanal 4</option>
+       </select>
+    </div>
+
+    <div class="form-row node-input-sensorType">
+       <label for="node-input-sensorType">Sensor type : </label>
+       <select type="text" id="node-input-sensorType" style="width:200px; display:inline-block">
+            <option>keine Auswahl</option>
+            <option>Pt100</option>
+            <option>Pt500</option>
+            <option>Pt1000</option>
+            <option>Thermoelement (Typ J)</option>
+            <option>Thermoelement (Typ K)</option>
+            <option>Thermoelement (Typ R)</option>
+            <option>Thermoelement (Typ T)</option>
+       </select>   
+    </div>
+	 </div>
+	 
+    <script>
+            $("#node-input-checkCh").change(function() {
+                var checkCh = $("#node-input-checkCh").val();
+             if (checkCh === "Kanal 1") {
+                 $(".node-input-sensorType").show();
+             } else if (checkCh === "Kanal 2") {
+                 $(".node-input-sensorType").show();
+             } else if (checkCh === "Kanal 3") {
+                 $(".node-input-sensorType").show();
+             } else if (checkCh === "Kanal 4") {
+                 $(".node-input-sensorType").show();
+             } 
+              else {
+                 $(".node-input-sensorType").hide();
+                 document.getElementById("node-input-checkCh").selectedIndex = "0";
+             }
+            }); 
+    </script>
+
+</script>
+
+<!-- Help text, for detailed information: https://nodered.org/docs/creating-nodes/help-style-guide -->
+
+<script type="text/x-red" data-help-name="mcan-4ao" lang="de-DE">
+<p>Verbindung mit einer analogen Signalausgabe µCAN.4.ao.</p>
+
+ <h3>Outputs</h3>
+     <ol class="node-ports">
+         <li>Standard Ausgang
+             <dl class="message-properties">
+                 <dt>Payload <span class="property-type">string</span></dt>
+                 <dd>Temperaturmesswert.</dd>
+             </dl>
+         </li>
+         <li>Standard error
+             <dl class="message-properties">
+                 <dt>payload <span class="property-type">string</span></dt>
+                 <dd>the standard error of the command.</dd>
+             </dl>
+         </li>
+     </ol>
+
+<h3>Details</h3>
+    <p><code>msg.payload</code> is used as the payload of the published message.
+    If it contains an Object it will be converted to a JSON string before being sent.
+    If it contains a binary Buffer the message will be published as-is.</p>
+    <p>The topic used can be configured in the node or, if left blank, can be set
+    by <code>msg.topic</code>.</p>
+    <p>Likewise the QoS and retain values can be configured in the node or, if left
+    blank, set by <code>msg.qos</code> and <code>msg.retain</code> respectively.</p>
+
+<h3>References</h3>
+    <ul>
+        <li><a>Twitter API docs</a> - full description of <code>msg.tweet</code> property</li>
+        <li><a>GitHub</a> - the nodes github repository</li>
+    </ul>
+</script>
+
+
+<script type="text/x-red" data-help-name="mcan-4ai" lang="en-US">
+<p>Connects to a MQTT broker and publishes messages.</p>
+
+<h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>payload
+            <span class="property-type">string | buffer</span>
+        </dt>
+        <dd> the payload of the message to publish. </dd>
+        <dt class="optional">topic <span class="property-type">string</span></dt>
+        <dd> the MQTT topic to publish to.</dd>
+    </dl>
+
+ <h3>Outputs</h3>
+     <ol class="node-ports">
+         <li>Standard output
+             <dl class="message-properties">
+                 <dt>payload <span class="property-type">string</span></dt>
+                 <dd>the standard output of the command.</dd>
+             </dl>
+         </li>
+         <li>Standard error
+             <dl class="message-properties">
+                 <dt>payload <span class="property-type">string</span></dt>
+                 <dd>the standard error of the command.</dd>
+             </dl>
+         </li>
+     </ol>
+
+<h3>Details</h3>
+    <p><code>msg.payload</code> is used as the payload of the published message.
+    If it contains an Object it will be converted to a JSON string before being sent.
+    If it contains a binary Buffer the message will be published as-is.</p>
+    <p>The topic used can be configured in the node or, if left blank, can be set
+    by <code>msg.topic</code>.</p>
+    <p>Likewise the QoS and retain values can be configured in the node or, if left
+    blank, set by <code>msg.qos</code> and <code>msg.retain</code> respectively.</p>
+
+<h3>References</h3>
+    <ul>
+        <li><a>Twitter API docs</a> - full description of <code>msg.tweet</code> property</li>
+        <li><a>GitHub</a> - the nodes github repository</li>
+    </ul>
+    <p>This node simulate µCAN.4.ti from MicroControl</p>
+</script>
+
+
