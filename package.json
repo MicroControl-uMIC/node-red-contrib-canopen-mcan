@@ -1,0 +1,22 @@
+{
+  "name": "node-red-contrib-canopen-mcan",
+  "version": "0.2.0",
+  "description": "Node-RED Nodes for MicroControl CANopen modules",
+  "repository": "https://to-be-defined",
+  "dependencies": {
+      "websocket": "^1.00.30"
+  },
+  "keywords": [ "node-red", "CANopen", "MicroControl" ],
+  "main": "none",
+  "engines": {
+      "node": ">= 8.0.0"
+  },
+  "node-red": {
+    "nodes": {
+      "mcan-4ai": "canopen/mcan-4ai.js",
+      "mcan-4ti": "canopen/mcan-4ti.js"
+    }
+  },
+  "author": "MicroControl GmbH & Co. KG",
+  "license": "Apache-2.0"
+}
