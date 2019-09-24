@@ -1,0 +1,12 @@
+{
+    "mcan-4ai" : {
+        "labelName"   : "Name",
+        "labelCanCh"  : "CAN Kanal",
+        "labelNodeId" : "Geräte Adresse",
+        "labelInpSel" : "Eingang auswählen",
+        "labelInpNum" : "Eingang",
+        "labelInpTyp" : "Signaltyp",
+        
+        "message2": "This is my second message"
+    }
+}

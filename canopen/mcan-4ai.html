@@ -30,13 +30,13 @@
     <img src="/node-red-contrib-canopen-mcan/icons/mcan-4xi.png" alt="µCAN.4.ai" style="width:257px;height:208px;align="middle">
 
     <div class="form-row">
-        <label for="node-input-name">Name : </label>
+        <label for="node-input-name"> <span data-i18n="mcan-4ai.labelName"></span> </label>
         <input type="text" id="node-input-name" style="width:200px; display:inline-block"> 
     </div>
 
     
     <div class="form-row">
-        <label for="node-input-canCh">CAN Kanal : </label>
+        <label for="node-input-canCh"><span data-i18n="mcan-4ai.labelCanCh"></span> </label>
         <select type="text" id="node-input-canCh" style="width:200px; display:inline-block">
             <option>CAN 1</option>
             <option>CAN 2</option>
@@ -44,15 +44,15 @@
     </div>
 
     <div class="form-row">
-        <label for="node-input-nodeID">Node-ID </label>
+        <label for="node-input-nodeID"><span data-i18n="mcan-4ai.labelNodeId"></span> </label>
         <input type="number" id="node-input-nodeID" style="width:200px; display:inline-block" max="127" min="1"> 
     </div>
 
 	 <div class="mcan-input">
-    <p align="left" style="margin-left:70px">Select input channel</p>
+    <p align="left" style="margin-left:70px"><span data-i18n="mcan-4ai.labelInpSel"></span></p>
 
     <div class="form-row">
-        <label for="node-input-checkCh"><i class="fa fa-thermometer-quarter"></i>Channel</label>
+        <label for="node-input-checkCh"><i class="fa fa-thermometer-quarter"></i> <span data-i18n="mcan-4ai.labelInpNum"></span></label>
         <select type="text" id="node-input-checkCh" style="width:200px; display:inline-block">
             <option>keine Auswahl</option>
             <option>Kanal 1</option>
@@ -63,7 +63,7 @@
     </div>
 
     <div class="form-row node-input-sensorType">
-       <label for="node-input-sensorType">Sensor type : </label>
+       <label for="node-input-sensorType"> <span data-i18n="mcan-4ai.labelInpTyp"></span> </label>
        <select type="text" id="node-input-sensorType" style="width:200px; display:inline-block">
             <option>keine Auswahl</option>
             <option>Pt100</option>
