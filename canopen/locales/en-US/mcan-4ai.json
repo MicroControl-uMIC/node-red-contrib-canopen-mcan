@@ -1,0 +1,10 @@
+{
+    "mcan-4ai" : {
+        "labelName"   : "Name",
+        "labelCanCh"  : "CAN channel",
+        "labelNodeId" : "Node ID",
+        "labelInpSel" : "Select input channel",
+        "labelInpNum" : "Input",
+        "labelInpTyp" : "Signal type"
+    }
+}

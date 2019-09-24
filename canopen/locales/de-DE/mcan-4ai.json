@@ -5,8 +5,6 @@
         "labelNodeId" : "Geräte Adresse",
         "labelInpSel" : "Eingang auswählen",
         "labelInpNum" : "Eingang",
-        "labelInpTyp" : "Signaltyp",
-        
-        "message2": "This is my second message"
+        "labelInpTyp" : "Signaltyp"
     }
 }
