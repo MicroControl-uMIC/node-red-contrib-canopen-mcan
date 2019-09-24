@@ -9,9 +9,9 @@
 //-----------------------------------------------------------------------------------------------------
 
 
-const mcanCommon = require ("../../canopen-mcan-common/canopen-mcan-common");
-
-;
+const idString  = require("./core/id_string");
+const webSocket = require("./core/websocket_comet.js");
+const nodeData  = require("./core/node_data.js");
 
 const modProdCode = "12.43.005";
 
@@ -46,14 +46,14 @@ module.exports = function(RED) {
         this.checkCh=config.checkCh;
 
         //create Buffer for rcv Data
-        var ti_data = new mcanCommon.data();
+        var ti_data = new nodeData();
         //creat id String
-        var identification = new mcanCommon.string(this.canCh, this.nodeId, this.checkCh, 12, modProdCode , modRevNr, deviceType, this.sensorType);
+        var identification = new idString(this.canCh, this.nodeId, this.checkCh, 12, modProdCode , modRevNr, deviceType, this.sensorType);
   
         var string = identification.makeIdString();
         
         //open socket
-        var ti_socket = new mcanCommon.socket(this.canCh, this.nodeID, this.checkCh);       
+        var ti_socket = new webSocket(this.canCh, this.nodeID, this.checkCh);       
         
 		var client = ti_socket.connect_ws();
 
@@ -109,5 +109,18 @@ module.exports = function(RED) {
         });
 
     }
-    RED.nodes.registerType("mCAN.4.ti", canopen_mcan_4ti);
+    
+    //---------------------------------------------------------------------------------------------------
+    // This additional path assures that ALL pictures are found by the server
+    //
+    RED.httpAdmin.get('/node-red-contrib-canopen-mcan/*', function(req, res){
+        var options = {
+            root: __dirname /*+ '/images/'*/,
+            dotfiles: 'deny'
+        };
+       
+        // Send the requested file to the client 
+        res.sendFile(req.params[0], options)
+    });
+    RED.nodes.registerType("mcan-4ti", canopen_mcan_4ti);
 };
