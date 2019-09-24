@@ -1,0 +1,103 @@
+<!-- for detailed information: https://nodered.org/docs/creating-nodes/node-html -->
+
+<script type="text/javascript">
+    RED.nodes.registerType('mCAN.4.ti',{
+        category: 'CANopen',
+        color: '#e69e39',
+        defaults: {
+            nodeID: {value: ""},
+            artikelNr: {value: "12.43.005"},
+            sensorType: {value: ""},
+            checkCh: {value: ""},
+            canCh: {value: ""},
+            name: {value: "µCAN.4.ti"}
+        },
+        oneditprepare: function() {
+            $('.editor-tray-content').css({"width" : 400 +  "px"});
+        },
+        outputs:1,
+        outputLabels: ["Output"],
+        icon: "font-awesome/fa-thermometer-0",
+        label: function() {
+	    return this.name || "µCAN.4.ti";}
+    });
+</script>
+
+<script type="text/x-red" data-template-name="mCAN.4.ti">
+
+    <p align="left" style="margin-left:75px" ><strong>MicroControl µCAN.4.ti </strong></p>
+
+    <img src="./icons/canopen-mcan-4xi.png" alt="µCAN.4.ti" style="width:257px;height:208px;align="middle">
+
+    <div class="form-row">
+        <label for="node-input-name">Name : </label>
+        <input type="text" id="node-input-name" style="width:200px; display:inline-block"> 
+    </div>
+
+    
+    <div class="form-row">
+        <label for="node-input-canCh">CAN Kanal : </label>
+        <select type="text" id="node-input-canCh" style="width:200px; display:inline-block">
+            <option>CAN 1</option>
+            <option>CAN 2</option>
+       </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-nodeID">Node-ID </label>
+        <input type="number" id="node-input-nodeID" style="width:200px; display:inline-block" max="127" min="1"> 
+    </div>
+
+	 <div class="mcan-input">
+    <p align="left" style="margin-left:70px">Select input channel</p>
+
+    <div class="form-row">
+        <label for="node-input-checkCh"><i class="fa fa-thermometer-quarter"></i>Channel</label>
+        <select type="text" id="node-input-checkCh" style="width:200px; display:inline-block">
+            <option>keine Auswahl</option>
+            <option>Kanal 1</option>
+            <option>Kanal 2</option>
+            <option>Kanal 3</option>
+            <option>Kanal 4</option>
+       </select>
+    </div>
+
+    <div class="form-row node-input-sensorType">
+       <label for="node-input-sensorType">Sensor type : </label>
+       <select type="text" id="node-input-sensorType" style="width:200px; display:inline-block">
+            <option>keine Auswahl</option>
+            <option>Pt100</option>
+            <option>Pt500</option>
+            <option>Pt1000</option>
+            <option>Thermoelement (Typ J)</option>
+            <option>Thermoelement (Typ K)</option>
+            <option>Thermoelement (Typ R)</option>
+            <option>Thermoelement (Typ T)</option>
+       </select>   
+    </div>
+	 </div>
+	 
+    <script>
+            $("#node-input-checkCh").change(function() {
+                var checkCh = $("#node-input-checkCh").val();
+             if (checkCh === "Kanal 1") {
+                 $(".node-input-sensorType").show();
+             } else if (checkCh === "Kanal 2") {
+                 $(".node-input-sensorType").show();
+             } else if (checkCh === "Kanal 3") {
+                 $(".node-input-sensorType").show();
+             } else if (checkCh === "Kanal 4") {
+                 $(".node-input-sensorType").show();
+             } 
+              else {
+                 $(".node-input-sensorType").hide();
+                 document.getElementById("node-input-checkCh").selectedIndex = "0";
+             }
+            }); 
+    </script>
+
+</script>
+
+<script type="text/x-red" data-help-name="4ti">
+    <p>This node simulate µCAN.4.ti from MicroControl</p>
+</script>
