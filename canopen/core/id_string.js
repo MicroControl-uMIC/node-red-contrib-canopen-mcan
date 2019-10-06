@@ -1,4 +1,4 @@
-//id_string.js
+// DeviceIdString.js
 //------------------------------------------------------------------------------------------------------
 // Use Strict Mode for JavaScript
 //------------------------------------------------------------------------------------------------------
@@ -6,36 +6,38 @@
 
 
 
-class id_string{
+class DeviceIdString {
 
-    constructor(canCh, nodeId, modCh, vendorId, prodCode, revNr, deviceType, sensorType) 
+    constructor(canBus, nodeId, moduleChannel, vendorId, productCode, revisionNumber, deviceType, sensorType) 
     {
 
-    	this.canCh = canCh;
-    	this.nodeId = nodeId;
-    	this.modCh = modCh;
-    	this.vendorId = vendorId;
-    	this.prodCode = prodCode;
-    	this.revNr = revNr;
-    	this.deviceType = deviceType;
-    	this.sensorType = sensorType;
+    	this.canBus         = canBus;
+    	this.nodeId         = nodeId;
+    	this.moduleChannel  = moduleChannel;
+    	this.vendorId       = vendorId;
+    	this.productCode    = productCode;
+    	this.revisionNumber = revisionNumber;
+    	this.deviceType     = deviceType;
+    	this.sensorType     = sensorType;
     }
     
     
-    makeIdString()
+    getIdString()
     {
-    	var idString = "can-bus: " +this.canCh+ "\n" +
-    	 "node-id: " +this.nodeID+ "\n" +
-    	 "channel: " +this.Channel+ "\n" +
-    	 "vendor-id: " +this.vendorId + "\n" +
-    	 "product-code: " +this.prodCode+ "\n" +
-    	 "revision-number: "+this.revNr + "\n" +
-    	 "devicetype: " +this.deviceType+ "\n" +
-    	 "signal-type: " +this.sensorType+ "\n";
+    	var idString = "can-bus: "        + this.canBus        	+ "\n" +
+    	               "node-id: "        + this.nodeID        	+ "\n" +
+    	               "module-channel: " + this.moduleChannel 	+ "\n" +
+    	               "vendor-id: "      + this.vendorId      	+ "\n" +
+    	               "product-code: "   + this.productCode   	+ "\n" +
+    	               "revision-number: "+ this.revisionNumber + "\n" +
+    	               "device-type: "    + this.deviceType	    + "\n" +
+    	               "sensor-type: "    + this.sensorType     + "\n";
     	
     	return idString;
     }
     
+    
+    // todo : needs to be changed because of language dependency
     static sensorToInt()
     {
     	var sensNr = 0;
@@ -104,6 +106,6 @@ class id_string{
 
 
 //------------------------------------------------------------------------------------------------------
-//export class, so other modules can create Calc objects
+// export class
 //------------------------------------------------------------------------------------------------------
-module.exports = id_string;
+module.exports = DeviceIdString;
