@@ -3,14 +3,14 @@
 <script type="text/javascript">
     RED.nodes.registerType('mcan-4ai',{
         category: 'CANopen',
-        color: '#e69e39',
+        color: '#FFCC66',
         defaults: {
-            nodeID: {value: ""},
-            artikelNr: {value: "12.43.005"},
+            nodeId: {value: ""},
+            productCode: {value: "12.43.005"},
             sensorType: {value: ""},
-            checkCh: {value: ""},
-            canCh: {value: ""},
-            name: {value: "µCAN.4.ai"}
+            moduleChannel: {value: ""},
+            canBus: {value: ""},
+            deviceName: {value: "µCAN.4.ai"}
         },
         oneditprepare: function() {
             $('.editor-tray-content').css({"width" : 400 +  "px"});
@@ -30,30 +30,30 @@
     <img src="/node-red-contrib-canopen-mcan/icons/mcan-4xi.png" alt="µCAN.4.ai" style="width:257px;height:208px;align="middle">
 
     <div class="form-row">
-        <label for="node-input-name"> <span data-i18n="mcan-4ai.labelName"></span> </label>
-        <input type="text" id="node-input-name" style="width:200px; display:inline-block"> 
+        <label for="node-input-deviceName"> <span data-i18n="mcan-4ai.labelName"></span> </label>
+        <input type="text" id="node-input-deviceName" style="width:200px; display:inline-block"> 
     </div>
 
     
     <div class="form-row">
-        <label for="node-input-canCh"><span data-i18n="mcan-4ai.labelCanCh"></span> </label>
-        <select type="text" id="node-input-canCh" style="width:200px; display:inline-block">
+        <label for="node-input-canBus"><span data-i18n="mcan-4ai.labelCanCh"></span> </label>
+        <select type="text" id="node-input-canBus" style="width:200px; display:inline-block">
             <option>CAN 1</option>
             <option>CAN 2</option>
        </select>
     </div>
 
     <div class="form-row">
-        <label for="node-input-nodeID"><span data-i18n="mcan-4ai.labelNodeId"></span> </label>
-        <input type="number" id="node-input-nodeID" style="width:200px; display:inline-block" max="127" min="1"> 
+        <label for="node-input-nodeId"><span data-i18n="mcan-4ai.labelNodeId"></span> </label>
+        <input type="number" id="node-input-nodeId" style="width:200px; display:inline-block" max="127" min="1"> 
     </div>
 
-	 <div class="mcan-input">
+	 <div class="mcan-labelInpSel">
     <p align="left" style="margin-left:70px"><span data-i18n="mcan-4ai.labelInpSel"></span></p>
 
     <div class="form-row">
-        <label for="node-input-checkCh"><i class="fa fa-thermometer-quarter"></i> <span data-i18n="mcan-4ai.labelInpNum"></span></label>
-        <select type="text" id="node-input-checkCh" style="width:200px; display:inline-block">
+        <label for="node-input-moduleChannel"><i class="fa fa-thermometer-quarter"></i> <span data-i18n="mcan-4ai.labelInpNum"></span></label>
+        <select type="text" id="node-input-moduleChannel" style="width:200px; display:inline-block">
             <option>keine Auswahl</option>
             <option>Kanal 1</option>
             <option>Kanal 2</option>
@@ -78,8 +78,8 @@
 	 </div>
 	 
     <script>
-            $("#node-input-checkCh").change(function() {
-                var checkCh = $("#node-input-checkCh").val();
+            $("#node-input-moduleChannel").change(function() {
+                var checkCh = $("#node-input-moduleChannel").val();
              if (checkCh === "Kanal 1") {
                  $(".node-input-sensorType").show();
              } else if (checkCh === "Kanal 2") {
@@ -91,7 +91,7 @@
              } 
               else {
                  $(".node-input-sensorType").hide();
-                 document.getElementById("node-input-checkCh").selectedIndex = "0";
+                 document.getElementById("node-input-moduleChannel").selectedIndex = "0";
              }
             }); 
     </script>

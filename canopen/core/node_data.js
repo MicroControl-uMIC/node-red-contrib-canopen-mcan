@@ -6,7 +6,7 @@
 
 var bufferView;
 
-class node_data
+class NodeData
 {
 	constructor()
 	{
@@ -79,4 +79,4 @@ class node_data
 		}
 	}
 }
-module.exports = node_data;
+module.exports = NodeData;

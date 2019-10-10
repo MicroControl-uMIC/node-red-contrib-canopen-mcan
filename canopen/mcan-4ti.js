@@ -8,10 +8,16 @@
 // import packages using "require" here
 //-----------------------------------------------------------------------------------------------------
 
-
 const idString  = require("./core/id_string");
 const webSocket = require("./core/websocket_comet.js");
 const nodeData  = require("./core/node_data.js");
+
+//------------------------------------------------------------------------------------------------------
+//Required for version information of the module, this is only used in the first module
+//
+const path = require('path');
+const fs   = require('fs');
+const pkg  = require(path.join(__dirname, '..', 'package.json'));
 
 const modProdCode = "12.43.005";
 
@@ -31,96 +37,95 @@ const ErrEnum =
 //-----------------------------------------------------------------------------------------------------
 
 module.exports = function(RED) {
-    function canopen_mcan_4ti(config) {
-        RED.nodes.createNode(this,config);
-       
-        //---------------------------------------------------------------------------------------------
-        // runs when flow is deployed
-        //---------------------------------------------------------------------------------------------
-        var node = this;
-        
-        this.nodeID=config.nodeID;
-        this.artikelNr=config.artikelNr;
-        this.sensorType=config.sensorType;
-        this.canCh=config.canCh;
-        this.checkCh=config.checkCh;
+    //---------------------------------------------------------------------------------------------
+    // Definition of class 'MCan4Ti'
+    //
+	class MCan4Ti {
+    	constructor(config)
+    	{
+	        RED.nodes.createNode(this,config);
+	       
+	        //---------------------------------------------------------------------------------------------
+	        // runs when flow is deployed
+	        //---------------------------------------------------------------------------------------------
+	        //init node variables
+	        var node = this;  
+            this.on('close', this.close);
+	        
+	        this.nodeId=config.nodeId;
+	        this.artikelNr=config.artikelNr;
+	        this.sensorType=config.sensorType;
+	        this.canCh=config.canCh;
+	        this.checkCh=config.checkCh;
+	
+	        //create Buffer for rcv Data
+	        var ti_data = new node_data();
+	        //init id String class
+	        var identification = new id_string(this.canCh, this.nodeId, this.checkCh, 12, modProdCode , modRevNr, deviceType, this.sensorType);
+	        	        
+	        //create id string
+	        var string = identification.makeIdString();
+	        
+	        //init node websocket class
+	        var ti_socket = new ws_comet(this.canCh, this.nodeId, this.checkCh);       
+	        //connect node websocket
+			var client = ti_socket.connect_ws();
 
-        //create Buffer for rcv Data
-        var ti_data = new nodeData();
-        //creat id String
-        var identification = new idString(this.canCh, this.nodeId, this.checkCh, 12, modProdCode , modRevNr, deviceType, this.sensorType);
-  
-        var string = identification.makeIdString();
-        
-        //open socket
-        var ti_socket = new webSocket(this.canCh, this.nodeID, this.checkCh);       
-        
-		var client = ti_socket.connect_ws();
-
-        client.onopen = function () {
-        	client.send("Here's some text that the server is urgently awaiting!"); 
-        	console.log('Connected ');
-        	};
-        
-    	client.onclose = function() {
-    	    console.log('echo-protocol Client Closed');
-    	    node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
-    	};
-    	
-
-        //gets executed when socket receives a message	
-    	client.onmessage = function (event) {
+	        //function handler when socket receives a message
+	    	client.onclose = function() 
+	    	{
+	    	    console.log('echo-protocol Client Closed');
+	    	    //display node status below node
+	    	    node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
+	    	};
+    	  	
+	    	//gets executed when socket receives a message	
+	    	client.onmessage = function (event) 
+	    	{
     			console.log("msg received");
 
+    			//copy received data into ArrayBuffer
                 ti_data.setBuffer(event.data, 32);
        
                 //check Status Variable
                 if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_NONE)
             	{
+                	//display node status below node
                 	node.status({fill:"green",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] OK"});
                 	
-                	var scaledData = ti_data.getValue(0) / 1000;
+                	//scale data
+                	var scaledData = (ti_data.getValue(0) * 0.1).toFixed(1);
                 	var msgData = {payload: scaledData };
-
-                	node.send(msgData);
-                	
+                	//send data to server
+                	node.send(msgData);        	
             	}
                 else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_SENROR)
             	{
+                	//display node status below node
                 	node.status({fill:"yellow",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Error"});                	
             	}
                 
                 else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_COMMUNICATION)
             	{
+                	//display node status below node
                 	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Error"});
             	}
                 else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION)
             	{
+                	//display node status below node
                 	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
             	}
                 
     		};
-
+    	}
         //---------------------------------------------------------------------------------------------
         // runs when node is closed (before deploy, e.g. to tidy up)
         //---------------------------------------------------------------------------------------------
-        node.on('close', function() {
+        close() 
+        {
         	ti_socket.disconnect_ws();
-        });
+        }
 
     }
-    
-    //---------------------------------------------------------------------------------------------------
-    // This additional path assures that ALL pictures are found by the server
-    //
-    RED.httpAdmin.get('/node-red-contrib-canopen-mcan/*', function(req, res){
-        var options = {
-            root: __dirname /*+ '/images/'*/,
-            dotfiles: 'deny'
-        };
-       
-        // Send the requested file to the client 
-        res.sendFile(req.params[0], options)
-    });
-    RED.nodes.registerType("mcan-4ti", canopen_mcan_4ti);
+    RED.nodes.registerType("4ti",MCan4Ti);
 };

@@ -14,7 +14,7 @@ var client;
 
 var wsUrl = 'ws://localhost:44660/';
 
-class ws_comet{
+class WsComet{
 
     constructor(canCh, nodeId, modCh) 
     {
@@ -94,4 +94,4 @@ class ws_comet{
 //------------------------------------------------------------------------------------------------------
 // export class, so other modules can create Calc objects
 //------------------------------------------------------------------------------------------------------
-module.exports = ws_comet;
+module.exports = WsComet;

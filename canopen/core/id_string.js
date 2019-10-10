@@ -25,7 +25,7 @@ class DeviceIdString {
     getIdString()
     {
     	var idString = "can-bus: "        + this.canBus        	+ "\n" +
-    	               "node-id: "        + this.nodeID        	+ "\n" +
+    	               "node-id: "        + this.nodeId        	+ "\n" +
     	               "module-channel: " + this.moduleChannel 	+ "\n" +
     	               "vendor-id: "      + this.vendorId      	+ "\n" +
     	               "product-code: "   + this.productCode   	+ "\n" +
