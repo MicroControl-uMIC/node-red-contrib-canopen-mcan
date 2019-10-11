@@ -8,16 +8,10 @@
 // import packages using "require" here
 //-----------------------------------------------------------------------------------------------------
 
-const idString  = require("./core/id_string");
-const webSocket = require("./core/websocket_comet.js");
-const nodeData  = require("./core/node_data.js");
 
-//------------------------------------------------------------------------------------------------------
-//Required for version information of the module, this is only used in the first module
-//
-const path = require('path');
-const fs   = require('fs');
-const pkg  = require(path.join(__dirname, '..', 'package.json'));
+const DeviceIdString  = require("./core/id_string");
+const WsComet = require("./core/websocket_comet.js");
+const NodeData  = require("./core/node_data.js");
 
 const modProdCode = "12.43.005";
 
@@ -25,107 +19,124 @@ const modRevNr = "v2";
 
 const deviceType = 131476;
 
+var ti_socket;
+
+var node;
+
 const ErrEnum = 
 {
 	eNODE_ERR_NONE: 0,
 	eNODE_ERR_SENSOR: -10,
 	eNODE_ERR_COMMUNICATION: -20,
-	eNODE_ERR_CONNECTION: -30
+	eNODE_ERR_CONNECTION: -30,
+	eNODE_ERR_CONNECTION_NETWORK: -31,
+	eNODE_ERR_CONNECTION_DEVICE: -32,
+	eNODE_ERR_CONNECTION_CHANNEL: -33
 };
 //-----------------------------------------------------------------------------------------------------
 // define variables here
 //-----------------------------------------------------------------------------------------------------
 
 module.exports = function(RED) {
-    //---------------------------------------------------------------------------------------------
-    // Definition of class 'MCan4Ti'
-    //
-	class MCan4Ti {
-    	constructor(config)
-    	{
+	
+    class MCAN4Ti
+    {
+		constructor(config) 
+	    {
 	        RED.nodes.createNode(this,config);
 	       
 	        //---------------------------------------------------------------------------------------------
 	        // runs when flow is deployed
 	        //---------------------------------------------------------------------------------------------
-	        //init node variables
-	        var node = this;  
+	        node = this;  
             this.on('close', this.close);
 	        
 	        this.nodeId=config.nodeId;
-	        this.artikelNr=config.artikelNr;
+	        this.productCode=config.productCode;
 	        this.sensorType=config.sensorType;
-	        this.canCh=config.canCh;
-	        this.checkCh=config.checkCh;
+	        this.canBus=config.canBus;
+	        this.moduleChannel=config.moduleChannel;
 	
 	        //create Buffer for rcv Data
-	        var ti_data = new node_data();
-	        //init id String class
-	        var identification = new id_string(this.canCh, this.nodeId, this.checkCh, 12, modProdCode , modRevNr, deviceType, this.sensorType);
-	        	        
-	        //create id string
-	        var string = identification.makeIdString();
+	        var ti_data = new NodeData();
 	        
-	        //init node websocket class
-	        var ti_socket = new ws_comet(this.canCh, this.nodeId, this.checkCh);       
-	        //connect node websocket
+	        //creat id String
+	        var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 12, modProdCode , modRevNr, deviceType, this.sensorType);
+	        
+	        //open socket
+	        ti_socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);       
+	        
 			var client = ti_socket.connect_ws();
-
-	        //function handler when socket receives a message
+	        
+			client.onopen = function()
+			{
+				//send identification string upon socket connection
+	    	    console.log(identification.getIdString());
+				client.send(identification.getIdString());
+			};
+			
 	    	client.onclose = function() 
 	    	{
 	    	    console.log('echo-protocol Client Closed');
-	    	    //display node status below node
-	    	    node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
+	    	    node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Not connected"});
 	    	};
-    	  	
-	    	//gets executed when socket receives a message	
+	    	
+	        //gets executed when socket receives a message	
 	    	client.onmessage = function (event) 
 	    	{
-    			console.log("msg received");
-
-    			//copy received data into ArrayBuffer
-                ti_data.setBuffer(event.data, 32);
-       
-                //check Status Variable
-                if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_NONE)
-            	{
-                	//display node status below node
-                	node.status({fill:"green",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] OK"});
-                	
-                	//scale data
-                	var scaledData = (ti_data.getValue(0) * 0.1).toFixed(1);
-                	var msgData = {payload: scaledData };
-                	//send data to server
-                	node.send(msgData);        	
-            	}
-                else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_SENROR)
-            	{
-                	//display node status below node
-                	node.status({fill:"yellow",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Error"});                	
-            	}
-                
-                else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_COMMUNICATION)
-            	{
-                	//display node status below node
-                	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Error"});
-            	}
-                else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION)
-            	{
-                	//display node status below node
-                	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
-            	}
-                
-    		};
-    	}
+	    			console.log("msg received");
+	
+	    			ti_data.setBuffer(event.data, 32);
+	       
+	                //check Status Variable
+	                if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_NONE)
+	            	{
+	                	node.status({fill:"green",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] OK"});
+	                	
+	                	var scaledData = ti_data.getValue(0) / 1000;
+	                	var msgData = {payload: scaledData };
+	
+	                	node.send(msgData);
+	                	
+	            	}
+	                else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_SENROR)
+	            	{
+	                	node.status({fill:"yellow",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Error"});                	
+	            	}	                
+	                else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_COMMUNICATION)
+	            	{
+	                	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Error"});
+	            	}
+	                else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION)
+	            	{
+	                	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
+	            	}
+	                else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_NETWORK)
+	            	{
+	                	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Wrong Network"});
+	            	}
+	                else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_DEVICE)
+	            	{
+	                	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Wrong Node-ID"});
+	            	}
+	                else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_CHANNEL)
+	            	{
+	                	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Wrong Channel"});
+	            	}
+	                
+	    		};
+	    }
+		
         //---------------------------------------------------------------------------------------------
         // runs when node is closed (before deploy, e.g. to tidy up)
         //---------------------------------------------------------------------------------------------
-        close() 
+        close()
         {
-        	ti_socket.disconnect_ws();
+        	ai_socket.disconnect_ws();
+        	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
         }
 
     }
-    RED.nodes.registerType("4ti",MCan4Ti);
-};
+    
+    RED.nodes.registerType("mcan-4ti", MCAN4Ti);
+}

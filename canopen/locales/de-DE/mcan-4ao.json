@@ -1,0 +1,11 @@
+{
+    "mcan-4ao" : {
+        "labelName"   : "Name",
+        "labelCanCh"  : "CAN Kanal",
+        "labelNodeId" : "Geräte Adresse",
+        "labelOutSel" : "Ausgang auswählen",
+        "labelOutNum" : "Ausgang",
+        "labelOutTyp" : "Signaltyp",
+        "labelOutVal" : "Wert"
+    }
+}

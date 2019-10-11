@@ -17,7 +17,6 @@
         },
         outputs:1,
         outputLabels: ["Output"],
-        icon: "font-awesome/fa-thermometer-0",
         label: function() {
 	    return this.name || "µCAN.4.ai";}
     });
@@ -66,13 +65,8 @@
        <label for="node-input-sensorType"> <span data-i18n="mcan-4ai.labelInpTyp"></span> </label>
        <select type="text" id="node-input-sensorType" style="width:200px; display:inline-block">
             <option>keine Auswahl</option>
-            <option>Pt100</option>
-            <option>Pt500</option>
-            <option>Pt1000</option>
-            <option>Thermoelement (Typ J)</option>
-            <option>Thermoelement (Typ K)</option>
-            <option>Thermoelement (Typ R)</option>
-            <option>Thermoelement (Typ T)</option>
+            <option>0..10V</option>
+            <option>0..24mA</option>
        </select>   
     </div>
 	 </div>
