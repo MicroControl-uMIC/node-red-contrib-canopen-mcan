@@ -1,0 +1,9 @@
+{
+    "mcan-8do" : {
+        "labelName"   : "Name",
+        "labelCanCh"  : "CAN Kanal",
+        "labelNodeId" : "Geräte Adresse",
+        "labelOutSel" : "Ausgang auswählen",
+        "labelOutNum" : "Ausgang"
+    }
+}

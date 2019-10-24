@@ -78,7 +78,7 @@ module.exports = function(RED) {
 	    	client.onclose = function() 
 	    	{
 	    	    console.log('echo-protocol Client Closed');
-	    	    node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Not connected"});
+	    	    node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
 	    	};
 	    	
 	        //gets executed when socket receives a message	
@@ -93,7 +93,7 @@ module.exports = function(RED) {
 	            	{
 	                	node.status({fill:"green",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] OK"});
 	                	
-	                	var scaledData = ti_data.getValue(0) / 1000;
+	                	var scaledData = ti_data.getValue(0) / 10;
 	                	var msgData = {payload: scaledData };
 	
 	                	node.send(msgData);
@@ -132,7 +132,7 @@ module.exports = function(RED) {
         //---------------------------------------------------------------------------------------------
         close()
         {
-        	ai_socket.disconnect_ws();
+        	ti_socket.disconnect_ws();
         	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
         }
 

@@ -9,13 +9,15 @@
   "keywords": [ "node-red", "CANopen", "MicroControl" ],
   "main": "none",
   "engines": {
-      "node": ">= 8.0.0"
+      "node": ">= 8.0.1"
   },
   "node-red": {
     "nodes": {
       "mcan-4ai": "canopen/mcan-4ai.js",
       "mcan-4ao": "canopen/mcan-4ao.js",
-      "mcan-4ti": "canopen/mcan-4ti.js"
+      "mcan-4ti": "canopen/mcan-4ti.js",
+      "mcan-8di": "canopen/mcan-8di.js",
+      "mcan-8do": "canopen/mcan-8do.js"
     }
   },
   "author": "MicroControl GmbH & Co. KG",

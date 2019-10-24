@@ -1,0 +1,9 @@
+{
+    "mcan-8di" : {
+        "labelName"   : "Name",
+        "labelCanCh"  : "CAN Kanal",
+        "labelNodeId" : "Geräte Adresse",
+        "labelInpSel" : "Eingang auswählen",
+        "labelInpNum" : "Eingang"
+    }
+}

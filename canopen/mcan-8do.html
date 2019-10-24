@@ -1,0 +1,69 @@
+<!-- for detailed information: https://nodered.org/docs/creating-nodes/node-html -->
+
+<script type="text/javascript">
+    RED.nodes.registerType('mcan-8dio out',{
+        category: 'CANopen',
+        color: '#FFCC66',
+        defaults: {
+            nodeId: {value: ""},
+            productCode: {value: "12.86.014"},
+            sensorType: {value: "output"},
+            moduleChannel: {value: ""},
+            canBus: {value: ""},
+            deviceName: {value: "µCAN.8.dio"}
+        },
+        oneditprepare: function() {
+            $('.editor-tray-content').css({"width" : 400 +  "px"});
+        },
+        inputs:1,
+        inputLabels: ["Input"],
+        icon: "font-awesome/sign-in",
+        label: function() {
+	    return this.name || "µCAN.8.dio out";}
+    });
+</script>
+
+<script type="text/x-red" data-template-name="mcan-8dio out">
+
+    <p align="left"><strong>µCAN.8.dio-BOX </strong></p>
+
+    <img src="/node-red-contrib-canopen-mcan/icons/mcan-8dio.png" alt="µCAN.8.dio" style="width:257px;height:208px;align="middle">
+
+    <div class="form-row">
+        <label for="node-input-deviceName"> <span data-i18n="mcan-8do.labelName"></span> </label>
+        <input type="text" id="node-input-deviceName" style="width:200px; display:inline-block"> 
+    </div>
+
+    
+    <div class="form-row">
+        <label for="node-input-canBus"><span data-i18n="mcan-8do.labelCanCh"></span> </label>
+        <select type="text" id="node-input-canBus" style="width:200px; display:inline-block">
+            <option>CAN 1</option>
+            <option>CAN 2</option>
+       </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-nodeId"><span data-i18n="mcan-8do.labelNodeId"></span> </label>
+        <input type="number" id="node-input-nodeId" style="width:200px; display:inline-block" max="127" min="1"> 
+    </div>
+
+	 <div class="mcan-labelInpSel">
+    <p align="left" style="margin-left:70px"><span data-i18n="mcan-8do.labelOutSel"></span></p>
+
+    <div class="form-row">
+        <label for="node-input-moduleChannel"> <span data-i18n="mcan-8do.labelOutNum"></span></label>
+        <select type="text" id="node-input-moduleChannel" style="width:200px; display:inline-block">
+            <option>keine Auswahl</option>
+            <option>Kanal 1</option>
+            <option>Kanal 2</option>
+            <option>Kanal 3</option>
+            <option>Kanal 4</option>
+            <option>Kanal 5</option>
+            <option>Kanal 6</option>
+            <option>Kanal 7</option>
+            <option>Kanal 8</option>
+       </select>
+    </div>
+
+</script>

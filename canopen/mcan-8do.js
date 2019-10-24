@@ -19,9 +19,11 @@ const modRevNr = "v2";
 
 const deviceType = 131476;
 
-var ai_socket;
+var do_socket;
 
 var node;
+
+const sensorType = "output";
 
 const ErrEnum = 
 {
@@ -39,7 +41,7 @@ const ErrEnum =
 
 module.exports = function(RED) {
 	
-    class MCAN4Ai
+    class MCAN8Do
     {
 		constructor(config) 
 	    {
@@ -50,23 +52,23 @@ module.exports = function(RED) {
 	        //---------------------------------------------------------------------------------------------
 	        node = this;  
             this.on('close', this.close);
+            this.on('input', this.input);
 	        
 	        this.nodeId=config.nodeId;
 	        this.productCode=config.productCode;
-	        this.sensorType=config.sensorType;
 	        this.canBus=config.canBus;
 	        this.moduleChannel=config.moduleChannel;
 	
 	        //create Buffer for rcv Data
-	        var ai_data = new NodeData();
+	        var do_data = new NodeData();
 	        
 	        //creat id String
-	        var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 12, modProdCode , modRevNr, deviceType, this.sensorType);
+	        var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 12, modProdCode , modRevNr, deviceType, sensorType);
 	        
 	        //open socket
-	        ai_socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);       
+	        do_socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);       
 	        
-			var client = ai_socket.connect_ws();
+			var client = do_socket.connect_ws();
 	        
 			client.onopen = function()
 			{
@@ -78,7 +80,7 @@ module.exports = function(RED) {
 	    	client.onclose = function() 
 	    	{
 	    	    console.log('echo-protocol Client Closed');
-	    	    node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Not connected"});
+	    	    node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Not connected"});
 	    	};
 	    	
 	        //gets executed when socket receives a message	
@@ -86,72 +88,56 @@ module.exports = function(RED) {
 	    	{
 	    			console.log("msg received");
 	
-	    			ai_data.setBuffer(event.data, 32);
+	    			do_data.setBuffer(event.data, 32);
 	       
 	                //check Status Variable
-	                if(ai_data.getValue(1) === ErrEnum.eNODE_ERR_NONE)
+	                if(do_data.getValue(1) === ErrEnum.eNODE_ERR_NONE)
 	            	{
-	                	node.status({fill:"green",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] OK"});
-	                	
-	                	var scaledData = ai_data.getValue(0) / 10;
-	                	var msgData = {payload: scaledData };
-	
-	                	node.send(msgData);
-	                	
+	                	node.status({fill:"green",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] OK"});	                	
 	            	}
-	                else if(ai_data.getValue(1) === ErrEnum.eNODE_ERR_SENROR)
+	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_SENROR)
 	            	{
-	                	node.status({fill:"yellow",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Error"});                	
+	                	node.status({fill:"yellow",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Error"});                	
 	            	}	                
-	                else if(ai_data.getValue(1) === ErrEnum.eNODE_ERR_COMMUNICATION)
+	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_COMMUNICATION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Error"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Error"});
 	            	}
-	                else if(ai_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION)
+	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Not connected"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Not connected"});
 	            	}
-	                else if(ai_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_NETWORK)
+	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_NETWORK)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Wrong Network"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Wrong Network"});
 	            	}
-	                else if(ai_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_DEVICE)
+	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_DEVICE)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Wrong Node-ID"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Wrong Node-ID"});
 	            	}
-	                else if(ai_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_CHANNEL)
+	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_CHANNEL)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Wrong Channel"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Wrong Channel"});
 	            	}
 	                
 	    		};
-	    		
-	    		console.log(node.getElementById("node-input-moduleChannel").value);
 	    }
+		
+        input(msg) 
+        {
+        	client.send(msg.payload);
+        }
 		
         //---------------------------------------------------------------------------------------------
         // runs when node is closed (before deploy, e.g. to tidy up)
         //---------------------------------------------------------------------------------------------
         close()
         {
-        	ai_socket.disconnect_ws();
-        	node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Not connected"});
+        	do_socket.disconnect_ws();
+        	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Not connected"});
         }
 
     }
-
-  //---------------------------------------------------------------------------------------------------
-  // This additional path assures that ALL pictures are found by the server
-  //
-  RED.httpAdmin.get('/node-red-contrib-canopen-mcan/*', function(req, res){
-      var options = {
-          root: __dirname /*+ '/images/'*/,
-          dotfiles: 'deny'
-      };
-     
-      // Send the requested file to the client 
-      res.sendFile(req.params[0], options)
-  });
     
-    RED.nodes.registerType("mcan-4ai", MCAN4Ai);
+    RED.nodes.registerType("mcan-8dio out", MCAN8Do);
 }

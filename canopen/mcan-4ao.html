@@ -3,7 +3,7 @@
 <script type="text/javascript">
     RED.nodes.registerType('mcan-4ao',{
         category: 'CANopen',
-        color: '#e69e39',
+        color: '#FFCC66',
         defaults: {
             nodeID: {value: ""},
             artikelNr: {value: "12.43.005"},
@@ -67,13 +67,8 @@
        <label for="node-input-sensorType">Sensor type : </label>
        <select type="text" id="node-input-sensorType" style="width:200px; display:inline-block">
             <option>keine Auswahl</option>
-            <option>Pt100</option>
-            <option>Pt500</option>
-            <option>Pt1000</option>
-            <option>Thermoelement (Typ J)</option>
-            <option>Thermoelement (Typ K)</option>
-            <option>Thermoelement (Typ R)</option>
-            <option>Thermoelement (Typ T)</option>
+            <option>0..10V</option>
+            <option>0..20mA</option>
        </select>   
     </div>
 	 </div>

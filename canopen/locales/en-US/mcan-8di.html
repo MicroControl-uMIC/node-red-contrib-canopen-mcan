@@ -1,0 +1,27 @@
+<!-- Help text, for detailed information: https://nodered.org/docs/creating-nodes/help-style-guide -->
+
+<script type="text/x-red" data-help-name="mcan-8dio in" lang="en-US">
+<p>Digital input of a µCAN.8.dio module</p>
+
+<h3>Ausgaben</h3>
+    <ol class="node-ports">
+        <dl class="message-properties">
+            <dt>payload <span class="property-type">boolean</span></dt>
+                 <dd>Payload is <code>false</code> if there is a logical 0 at corresponding input. 
+                 Payload is <code>true</code> if there is a logical 1 at corresponding input.</dd>
+             </dl>
+        <dl class="message-properties">
+            <dt>topic <span class="property-type">String</span></dt>
+                 <dd>Das Topic wird auf <code>mcan8di/{inputNumber}</code> gesetzt.<br></dd>
+             </dl>
+     </ol>
+
+<p>
+<h3>Details</h3>
+    <p>
+    The node generates a <code>msg.payload</code> containing the value <code>true</code> or <code>false</code>, 
+which reflects the state of the digital input. The node only generates a message at an input stage change.
+	</p>
+
+    <p>This node simulates a µCAN.8.dio module of MicroControl.</p>
+</script>

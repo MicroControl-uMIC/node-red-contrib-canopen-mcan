@@ -1,7 +1,7 @@
 /*jshint esversion: 6 */ 
 
 //-----------------------------------------------------------------------------------------------------//
-// for detailed information: https://nodered.org/docs/creating-nodes/node-js       
+// for detailed information: https://nodered.org/docs/creating-nodes/node-js                           //
 //-----------------------------------------------------------------------------------------------------//
 
 //-----------------------------------------------------------------------------------------------------
@@ -9,105 +9,141 @@
 //-----------------------------------------------------------------------------------------------------
 
 
-const idString  = require("./core/id_string");
-const webSocket = require("./core/websocket_comet.js");
-const nodeData  = require("./core/node_data.js");
+const DeviceIdString  = require("./core/id_string");
+const WsComet = require("./core/websocket_comet.js");
+const NodeData  = require("./core/node_data.js");
 
-const modProdCode = "12.43.005";
+const modProdCode = "12.86.014";
 
 const modRevNr = "v2";
 
 const deviceType = 131476;
+
+var ao_socket;
+
+var node;
 
 const ErrEnum = 
 {
 	eNODE_ERR_NONE: 0,
 	eNODE_ERR_SENSOR: -10,
 	eNODE_ERR_COMMUNICATION: -20,
-	eNODE_ERR_CONNECTION: -30
+	eNODE_ERR_CONNECTION: -30,
+	eNODE_ERR_CONNECTION_NETWORK: -31,
+	eNODE_ERR_CONNECTION_DEVICE: -32,
+	eNODE_ERR_CONNECTION_CHANNEL: -33
 };
 //-----------------------------------------------------------------------------------------------------
 // define variables here
 //-----------------------------------------------------------------------------------------------------
 
 module.exports = function(RED) {
-    function canopen_mcan_4ao(config) {
-        RED.nodes.createNode(this,config);
-       
-        //---------------------------------------------------------------------------------------------
-        // runs when flow is deployed
-        //---------------------------------------------------------------------------------------------
-        var node = this;
-        
-        this.nodeID=config.nodeID;
-        this.artikelNr=config.artikelNr;
-        this.sensorType=config.sensorType;
-        this.canCh=config.canCh;
-        this.checkCh=config.checkCh;
-
-        //create Buffer for rcv Data
-        var ti_data = new nodeData();
-        //creat id String
-        var identification = new idString(this.canCh, this.nodeId, this.checkCh, 12, modProdCode , modRevNr, deviceType, this.sensorType);
-  
-        var string = identification.makeIdString();
-        
-        //open socket
-        var ti_socket = new webSocket(this.canCh, this.nodeID, this.checkCh);       
-        
-		var client = ti_socket.connect_ws();
-
-        client.onopen = function () {
-        	client.send("Here's some text that the server is urgently awaiting!"); 
-        	console.log('Connected ');
-        	};
-        
-    	client.onclose = function() {
-    	    console.log('echo-protocol Client Closed');
-    	    node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
-    	};
-    	
-
-        //gets executed when socket receives a message	
-    	client.onmessage = function (event) {
-    			console.log("msg received");
-
-                ti_data.setBuffer(event.data, 32);
-       
-                //check Status Variable
-                if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_NONE)
-            	{
-                	node.status({fill:"green",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] OK"});
-                	
-                	var scaledData = ti_data.getValue(0) / 1000;
-                	var msgData = {payload: scaledData };
-
-                	node.send(msgData);
-                	
-            	}
-                else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_SENROR)
-            	{
-                	node.status({fill:"yellow",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Error"});                	
-            	}
-                
-                else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_COMMUNICATION)
-            	{
-                	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Error"});
-            	}
-                else if(ti_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION)
-            	{
-                	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
-            	}
-                
-    		};
-
+	
+    class MCAN4Ao
+    {
+		constructor(config) 
+	    {
+	        RED.nodes.createNode(this,config);
+	       
+	        //---------------------------------------------------------------------------------------------
+	        // runs when flow is deployed
+	        //---------------------------------------------------------------------------------------------
+	        node = this;  
+            this.on('close', this.close);
+            this.on('input', this.input);
+	        
+	        this.nodeId=config.nodeId;
+	        this.productCode=config.productCode;
+	        this.canBus=config.canBus;
+	        this.moduleChannel=config.moduleChannel;
+	        this.sensorType=config.sensorType;
+	
+	        //create Buffer for rcv Data
+	        var ao_data = new NodeData();
+	        
+	        //creat id String
+	        var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 12, modProdCode , modRevNr, deviceType, this.sensorType);
+	        
+	        //open socket
+	        ao_socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);       
+	        
+			var client = ao_socket.connect_ws();
+	        
+			client.onopen = function()
+			{
+				//send identification string upon socket connection
+	    	    console.log(identification.getIdString());
+				client.send(identification.getIdString());
+			};
+			
+	    	client.onclose = function() 
+	    	{
+	    	    console.log('echo-protocol Client Closed');
+	    	    node.status({fill:"red",shape:"dot",text: "[In "+ao_socket.getChannelUrl()+"] Not connected"});
+	    	};
+	    	
+	        //gets executed when socket receives a message	
+	    	client.onmessage = function (event) 
+	    	{
+	    			console.log("msg received");
+	
+	    			ao_data.setBuffer(event.data, 32);
+	       
+	                //check Status Variable
+	                if(ao_data.getValue(1) === ErrEnum.eNODE_ERR_NONE)
+	            	{
+	                	node.status({fill:"green",shape:"dot",text: "[In "+ao_socket.getChannelUrl()+"] OK"});	                	
+	            	}
+	                else if(ao_data.getValue(1) === ErrEnum.eNODE_ERR_SENROR)
+	            	{
+	                	node.status({fill:"yellow",shape:"dot",text: "[In "+ao_socket.getChannelUrl()+"] Error"});                	
+	            	}	                
+	                else if(ao_data.getValue(1) === ErrEnum.eNODE_ERR_COMMUNICATION)
+	            	{
+	                	node.status({fill:"red",shape:"dot",text: "[In "+ao_socket.getChannelUrl()+"] Error"});
+	            	}
+	                else if(ao_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION)
+	            	{
+	                	node.status({fill:"red",shape:"dot",text: "[In "+ao_socket.getChannelUrl()+"] Not connected"});
+	            	}
+	                else if(ao_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_NETWORK)
+	            	{
+	                	node.status({fill:"red",shape:"dot",text: "[In "+ao_socket.getChannelUrl()+"] Wrong Network"});
+	            	}
+	                else if(ao_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_DEVICE)
+	            	{
+	                	node.status({fill:"red",shape:"dot",text: "[In "+ao_socket.getChannelUrl()+"] Wrong Node-ID"});
+	            	}
+	                else if(ao_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_CHANNEL)
+	            	{
+	                	node.status({fill:"red",shape:"dot",text: "[In "+ao_socket.getChannelUrl()+"] Wrong Channel"});
+	            	}
+	                
+	    		};
+	    }
+		
+        input(msg) 
+        {
+        	//create output data buffer 16bytes
+        	var outData = new Int32Array(4);
+        	outData[0] = msg.payload;
+        	outData[1] = 0;
+        	outData[2] = 0;
+        	outData[3] = 0;
+        	
+        	client.send(outData);
+        }
+		
         //---------------------------------------------------------------------------------------------
         // runs when node is closed (before deploy, e.g. to tidy up)
         //---------------------------------------------------------------------------------------------
-        node.on('close', function() {
-        	ti_socket.disconnect_ws();
-        });
+        close()
+        {
+        	ao_socket.disconnect_ws();
+        	node.status({fill:"red",shape:"dot",text: "[In "+ao_socket.getChannelUrl()+"] Not connected"});
+        }
 
     }
-    RED.nodes.registerType("mcan-4ao", canopen_mcan_4ao);
-};
+    
+    RED.nodes.registerType("mcan-4ao", MCAN4Ao);
+}
