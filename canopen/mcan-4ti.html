@@ -10,7 +10,7 @@
             sensorType: {value: ""},
             moduleChannel: {value: ""},
             canBus: {value: ""},
-            deviceName: {value: "µCAN.4.ai"}
+            deviceName: {value: "µCAN.4.ti"}
         },
         oneditprepare: function() {
             $('.editor-tray-content').css({"width" : 400 +  "px"});
@@ -25,7 +25,7 @@
 
 <script type="text/x-red" data-template-name="mcan-4ti">
 
-    <p align="left"><strong>µCAN.4.ai-BOX </strong></p>
+    <p align="left"><strong>µCAN.4.ti-BOX </strong></p>
 
     <img src="/node-red-contrib-canopen-mcan/icons/mcan-4xi.png" alt="µCAN.4.ti" style="width:257px;height:208px;align="middle">
 
@@ -55,10 +55,10 @@
         <label for="node-input-moduleChannel"><i class="fa fa-thermometer-quarter"></i> <span data-i18n="mcan-4ti.labelInpNum"></span></label>
         <select type="text" id="node-input-moduleChannel" style="width:200px; display:inline-block">
             <option>keine Auswahl</option>
-            <option>Kanal 1</option>
-            <option>Kanal 2</option>
-            <option>Kanal 3</option>
-            <option>Kanal 4</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
        </select>
     </div>
 
@@ -80,13 +80,13 @@
     <script>
             $("#node-input-moduleChannel").change(function() {
                 var checkCh = $("#node-input-moduleChannel").val();
-             if (checkCh === "Kanal 1") {
+             if (checkCh === "1") {
                  $(".node-input-sensorType").show();
-             } else if (checkCh === "Kanal 2") {
+             } else if (checkCh === "2") {
                  $(".node-input-sensorType").show();
-             } else if (checkCh === "Kanal 3") {
+             } else if (checkCh === "3") {
                  $(".node-input-sensorType").show();
-             } else if (checkCh === "Kanal 4") {
+             } else if (checkCh === "4") {
                  $(".node-input-sensorType").show();
              } 
               else {

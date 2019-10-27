@@ -38,7 +38,7 @@ class WsComet{
     	}
     	else
     	{
-    		canChId = "error";
+    		canChId = "0";
     	}
     	
     	return canChId;
@@ -66,7 +66,7 @@ class WsComet{
     	}
     	else
     	{
-    		channelId = "error";
+    		channelId = "0";
     	}
     	
     	return channelId;
@@ -77,7 +77,7 @@ class WsComet{
         var canUrl = this.getCanUrl();
         var chUrl = this.getChannelUrl();
     	
-    	var socketUrl = wsUrl + canUrl + "/" + this.nodeId + "/" + chUrl;
+    	var socketUrl = wsUrl + this.canCh + "/" + this.nodeId + "/" + this.modCh;
     	
     	client = new W3CWebSocket(socketUrl);
         
