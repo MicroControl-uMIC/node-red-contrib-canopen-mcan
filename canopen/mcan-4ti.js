@@ -10,14 +10,13 @@
 
 
 const DeviceIdString  = require("./core/id_string");
-const WsComet = require("./core/websocket_comet.js");
-const NodeData  = require("./core/node_data.js");
+const WsComet         = require("./core/websocket_comet.js");
+const NodeData        = require("./core/node_data.js");
 
-const modProdCode = "12.43.005";
+const moduledeviceType     = 131476;
+const moduleProductCode    = 1243005;
+const moduleRevisionNumber = 1;
 
-const modRevNr = "v2";
-
-const deviceType = 131476;
 
 var ti_socket;
 
@@ -49,19 +48,21 @@ module.exports = function(RED) {
 	        // runs when flow is deployed
 	        //---------------------------------------------------------------------------------------------
 	        node = this;  
-            this.on('close', this.close);
+           this.on('close', this.close);
 	        
-	        this.nodeId=config.nodeId;
-	        this.productCode=config.productCode;
-	        this.sensorType=config.sensorType;
-	        this.canBus=config.canBus;
-	        this.moduleChannel=config.moduleChannel;
+	        this.canBus        = config.canBus;
+	        this.nodeId        = config.nodeId;
+	        this.moduleChannel = config.moduleChannel;
+	        this.productCode   = config.productCode;
+	        this.sensorType    = config.sensorType;
 	
 	        //create Buffer for rcv Data
 	        var ti_data = new NodeData();
 	        
 	        //creat id String
-	        var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 12, modProdCode , modRevNr, deviceType, this.sensorType);
+			  var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 
+																	14, moduleProductCode , moduleRevisionNumber, moduledeviceType, 
+																	this.sensorType);
 	        
 	        //open socket
 	        ti_socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);       
@@ -71,7 +72,7 @@ module.exports = function(RED) {
 			client.onopen = function()
 			{
 				//send identification string upon socket connection
-	    	    console.log(identification.getIdString());
+	    	   console.log(identification.getIdString());
 				client.send(identification.getIdString());
 			};
 			
@@ -84,7 +85,7 @@ module.exports = function(RED) {
 	        //gets executed when socket receives a message	
 	    	client.onmessage = function (event) 
 	    	{
-	    			console.log("msg received");
+	    			//console.log("msg received");
 	
 	    			ti_data.setBuffer(event.data, 32);
 	       
