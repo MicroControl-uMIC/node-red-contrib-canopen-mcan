@@ -24,82 +24,82 @@ class DeviceIdString {
     
     getIdString()
     {
-    	var idString = "can-bus: "        + this.canBus        	+ "\n" +
-    	               "node-id: "        + this.nodeId        	+ "\n" +
-    	               "module-channel: " + this.moduleChannel 	+ "\n" +
-    	               "vendor-id: "      + this.vendorId      	+ "\n" +
-    	               "product-code: "   + this.productCode   	+ "\n" +
-    	               "revision-number: "+ this.revisionNumber + "\n" +
-    	               "device-type: "    + this.deviceType	    + "\n" +
-    	               "sensor-type: "    + this.sensorType     + "\n";
+    	var idString = "can-bus: "        + this.canBus        	+ ";" +
+    	               "node-id: "        + this.nodeId        	+ ";" +
+    	               "module-channel: " + this.moduleChannel 	+ ";" +
+    	               "vendor-id: "      + this.vendorId      	+ ";" +
+    	               "product-code: "   + this.productCode   	+ ";" +
+    	               "revision-number: "+ this.revisionNumber  + ";" +
+    	               "device-type: "    + this.deviceType	   + ";" +
+    	               "sensor-type: "    + this.sensorValue()          ;
     	
     	return idString;
     }
     
     
     // todo : needs to be changed because of language dependency
-    static sensorToInt()
+    sensorValue()
     {
-    	var sensNr = 0;
+    	var sensorValue = 0;
     	
     	if(this.sensorType === "Thermoelement (Typ J)")
     	{
-    		sensNr = "1";
+			sensorValue = 1;
     	}
     	else if(this.sensorType === "Thermoelement (Typ K)")
     	{
-    		sensNr = "2";
+			sensorValue = 2;
     	}
     	else if(this.sensorType === "Thermoelement (Typ L)")
     	{
-    		sensNr = "3";
+			sensorValue = 3;
     	}
     	else if(this.sensorType === "Thermoelement (Typ N)")
     	{
-    		sensNr = "4";
+			sensorValue = 4;
     	}
     	else if(this.sensorType === "Pt100")
     	{
-    		sensNr = "30";
+			sensorValue = 30;
     	}
     	else if(this.sensorType === "Pt200")
     	{
-    		sensNr = "31";
+			sensorValue = 31;
     	}
     	else if(this.sensorType === "Pt500")
     	{
-    		sensNr = "32";
+			sensorValue = 32;
     	}
     	else if(this.sensorType === "Pt1000")
     	{
-    		sensNr = "33";
+			sensorValue = 33;
     	}
     	else if(this.sensorType === "+/- 10V")
     	{
-    		sensNr = "41";
+			sensorValue = 41;
     	}
     	else if(this.sensorType === "0..10V")
     	{
-    		sensNr = "42";
+			sensorValue = 42;
     	}
     	else if(this.sensorType === "4..20mA")
     	{
-    		sensNr = "51";
+			sensorValue = 51;
     	}
     	else if(this.sensorType === "0..20mA")
     	{
-    		sensNr = "52";
+			sensorValue = 52;
     	}
       	else if(this.sensorType === "NTC")
     	{
-      		sensNr = "140";
+			sensorValue = 140;
     	}
     	else
     	{
-    		sensNr = "error";
+			sensorValue = "error";
     	}
     	
-    	return sensNr;
+    	return sensorValue;
     }
     
 }
