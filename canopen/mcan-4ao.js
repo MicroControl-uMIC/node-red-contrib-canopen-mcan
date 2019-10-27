@@ -85,7 +85,7 @@ module.exports = function(RED) {
 	        //gets executed when socket receives a message	
 	    	client.onmessage = function (event) 
 	    	{
-	    			console.log("msg received");
+	    			//console.log("msg received");
 	
 	    			ao_data.setBuffer(event.data, 32);
 	       

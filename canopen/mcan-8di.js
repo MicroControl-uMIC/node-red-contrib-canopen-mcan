@@ -87,7 +87,7 @@ module.exports = function(RED) {
 	        //gets executed when socket receives a message	
 	    	client.onmessage = function (event) 
 	    	{
-	    			console.log("msg received");
+	    			//console.log("msg received");
 	
 	    			di_data.setBuffer(event.data, 32);
 	       
