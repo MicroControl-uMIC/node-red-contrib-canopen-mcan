@@ -10,7 +10,7 @@
             sensorType: {value: ""},
             moduleChannel: {value: ""},
             canBus: {value: ""},
-            deviceName: {value: "µCAN.4.ti"}
+            deviceName: {value: "µCAN.4.ti"}           
         },
         oneditprepare: function() {
             $('.editor-tray-content').css({"width" : 400 +  "px"});
@@ -38,8 +38,8 @@
     <div class="form-row">
         <label for="node-input-canBus"><span data-i18n="mcan-4ti.labelCanCh"></span> </label>
         <select type="text" id="node-input-canBus" style="width:200px; display:inline-block">
-            <option>CAN 1</option>
-            <option>CAN 2</option>
+            <option value="1">CAN 1</option>
+            <option value="2">CAN 2</option>
        </select>
     </div>
 
@@ -55,10 +55,10 @@
         <label for="node-input-moduleChannel"><i class="fa fa-thermometer-quarter"></i> <span data-i18n="mcan-4ti.labelInpNum"></span></label>
         <select type="text" id="node-input-moduleChannel" style="width:200px; display:inline-block">
             <option>keine Auswahl</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
+            <option value="1">Kanal 1</option>
+            <option value="2">Kanal 2</option>
+            <option value="3">Kanal 3</option>
+            <option value="4">Kanal 4</option>
        </select>
     </div>
 
@@ -66,17 +66,21 @@
        <label for="node-input-sensorType"> <span data-i18n="mcan-4ti.labelInpTyp"></span> </label>
        <select type="text" id="node-input-sensorType" style="width:200px; display:inline-block">
             <option>keine Auswahl</option>
-            <option>Pt100</option>
-            <option>Pt500</option>
-            <option>Pt1000</option>
-            <option>Thermoelement (Typ J)</option>
-            <option>Thermoelement (Typ K)</option>
-            <option>Thermoelement (Typ R)</option>
-            <option>Thermoelement (Typ T)</option>
+            <option value="30">Pt100</option>
+            <option value="32">Pt500</option>
+            <option value="33">Pt1000</option>
+            <option value="1">Thermoelement (Typ J)</option>
+            <option value="2">Thermoelement (Typ K)</option>
+            <option value="3">Thermoelement (Typ L)</option>
+            <option value="4">Thermoelement (Typ N)</option>
        </select>   
     </div>
 	 </div>
-	 
+ 
+<script>
+
+    </script>
+
     <script>
             $("#node-input-moduleChannel").change(function() {
                 var checkCh = $("#node-input-moduleChannel").val();
@@ -94,6 +98,7 @@
                  document.getElementById("node-input-moduleChannel").selectedIndex = "0";
              }
             }); 
+            
     </script>
 
 </script>

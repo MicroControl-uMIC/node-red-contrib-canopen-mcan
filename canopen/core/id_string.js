@@ -24,19 +24,19 @@ class DeviceIdString {
     
     getIdString()
     {
-    	var idString = "can-bus: "        + this.canBus        	+ ";" +
-    	               "node-id: "        + this.nodeId        	+ ";" +
-    	               "module-channel: " + this.moduleChannel 	+ ";" +
-    	               "vendor-id: "      + this.vendorId      	+ ";" +
-    	               "product-code: "   + this.productCode   	+ ";" +
-    	               "revision-number: "+ this.revisionNumber  + ";" +
-    	               "device-type: "    + this.deviceType	   + ";" +
-    	               "sensor-type: "    + this.sensorValue()          ;
+    	var idString = this.canBus        	+ ";" +
+    	               this.nodeId        	+ ";" +
+    	               this.moduleChannel 	+ ";" +
+    	               this.vendorId      	+ ";" +
+    	               this.productCode   	+ ";" +
+    	               this.revisionNumber  + ";" +
+    	               this.deviceType	   + ";" +
+    	               this.sensorType;
     	
     	return idString;
     }
     
-    
+/*    
     // todo : needs to be changed because of language dependency
     sensorValue()
     {
@@ -101,7 +101,7 @@ class DeviceIdString {
     	
     	return sensorValue;
     }
-    
+  */  
 }
 
 
