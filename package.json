@@ -17,7 +17,8 @@
       "mcan-4ao": "canopen/mcan-4ao.js",
       "mcan-4ti": "canopen/mcan-4ti.js",
       "mcan-8di": "canopen/mcan-8di.js",
-      "mcan-8do": "canopen/mcan-8do.js"
+      "mcan-8do": "canopen/mcan-8do.js",
+      "mcan-8do": "canopen/mcan-8pwm.js"
     }
   },
   "author": "MicroControl GmbH & Co. KG",

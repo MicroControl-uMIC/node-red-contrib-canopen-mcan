@@ -1,0 +1,10 @@
+{
+    "mcan-8pwm" : {
+        "labelName"   : "Name",
+        "labelCanCh"  : "CAN Kanal",
+        "labelNodeId" : "Geräte Adresse",
+        "labelOutSel" : "Ausgang auswählen",
+        "labelOutNum" : "Ausgang",
+        "labelModFreq": "Grundfrequenz"
+    }
+}

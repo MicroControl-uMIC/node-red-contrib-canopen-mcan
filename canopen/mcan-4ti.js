@@ -63,7 +63,11 @@ module.exports = function(RED) {
 			  var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 
 																	14, moduleProductCode , moduleRevisionNumber, moduledeviceType, 
 																	this.sensorType);
-	        
+	        //add specific string
+			  var idString = identification.getIdString();
+			  idString = idString + "sensor-type: "    + config.sensorType	   + ";";
+			
+			
 	        //open socket
 	        ti_socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);       
 	        
@@ -72,8 +76,8 @@ module.exports = function(RED) {
 			client.onopen = function()
 			{
 				//send identification string upon socket connection
-	    	   console.log(identification.getIdString());
-				client.send(identification.getIdString());
+	    	    console.log(idString);
+				client.send(idString);
 			};
 			
 	    	client.onclose = function() 

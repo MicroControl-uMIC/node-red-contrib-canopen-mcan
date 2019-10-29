@@ -5,6 +5,17 @@
         "labelNodeId" : "Geräte Adresse",
         "labelInpSel" : "Eingang auswählen",
         "labelInpNum" : "Eingang",
-        "labelInpTyp" : "Signaltyp"
+        "labelInpTyp" : "Signaltyp",
+        "optionCh1" : "Kanal 1",
+        "optionCh2" : "Kanal 2",
+        "optionCh3" : "Kanal 3",
+        "optionCh4" : "Kanal 4",
+        "optionThJ" : "Thermoelement (Typ J)",
+        "optionThK" : "Thermoelement (Typ K)",
+        "optionThL" : "Thermoelement (Typ L)",
+        "optionThN" : "Thermoelement (Typ N)",
+        "optionPt100" : "Pt100",
+        "optionPt500" : "Pt500",
+        "optionPt1000" : "Pt1000"
     }
 }

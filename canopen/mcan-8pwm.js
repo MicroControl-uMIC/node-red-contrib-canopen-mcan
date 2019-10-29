@@ -13,17 +13,17 @@ const DeviceIdString  = require("./core/id_string");
 const WsComet = require("./core/websocket_comet.js");
 const NodeData  = require("./core/node_data.js");
 
-const modProdCode = "12.86.014";
+const moduledeviceType     = 0;
+const moduleProductCode    = 1287006;
+const moduleRevisionNumber = 1;
 
-const modRevNr = "v2";
+var pwm_socket;
 
-const deviceType = 131476;
-
-var do_socket;
+var diStateOld = false;
 
 var node;
 
-const sensorType = "output";
+const sensorType = "input";
 
 const ErrEnum = 
 {
@@ -41,7 +41,7 @@ const ErrEnum =
 
 module.exports = function(RED) {
 	
-    class MCAN8Do
+    class MCAN8Pwm
     {
 		constructor(config) 
 	    {
@@ -52,29 +52,29 @@ module.exports = function(RED) {
 	        //---------------------------------------------------------------------------------------------
 	        node = this;  
             this.on('close', this.close);
-            this.on('input', this.input);
 	        
 	        this.nodeId=config.nodeId;
 	        this.productCode=config.productCode;
 	        this.canBus=config.canBus;
 	        this.moduleChannel=config.moduleChannel;
+	        this.moduleFreq = config.moduleFreq;
 	
 	        //create Buffer for rcv Data
-	        var do_data = new NodeData();
+	        var pwm_data = new NodeData();
 	        
 	        //creat id String
-	        var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 12, modProdCode , modRevNr, deviceType, sensorType);
+	        var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 
+					14, moduleProductCode , moduleRevisionNumber, moduledeviceType, 
+					this.sensorType);
 	        
-	      //add specific string
+	        //add specific string
 	        var idString = identification.getIdString();
-	        idString = idString + "port-direction: 1"+ ";" + 
-			"error-mode: 0"+ ";" +
-			"error-value: 0"+ ";";
-			
-	        //open socket
-	        do_socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);       
+	        idString = idString + "base-frequency: "    + config.moduleFreq	   + ";";
 	        
-			var client = do_socket.connect_ws();
+	        //open socket
+	        pwm_socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);       
+	        
+			var client = pwm_socket.connect_ws();
 	        
 			client.onopen = function()
 			{
@@ -86,7 +86,7 @@ module.exports = function(RED) {
 	    	client.onclose = function() 
 	    	{
 	    	    console.log('echo-protocol Client Closed');
-	    	    node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Not connected"});
+	    	    node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Not connected"});
 	    	};
 	    	
 	        //gets executed when socket receives a message	
@@ -94,56 +94,61 @@ module.exports = function(RED) {
 	    	{
 	    			//console.log("msg received");
 	
-	    			do_data.setBuffer(event.data, 32);
+	    			pwm_data.setBuffer(event.data, 32);
 	       
 	                //check Status Variable
-	                if(do_data.getValue(1) === ErrEnum.eNODE_ERR_NONE)
+	                if(pwm_data.getValue(1) === ErrEnum.eNODE_ERR_NONE)
 	            	{
-	                	node.status({fill:"green",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] OK"});	                	
+	                	node.status({fill:"green",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] OK"});
+	                	
+//	                	var diState = pwm_data.getValue(0);
+//
+//	                	if(diState != diStateOld)
+//	                	{
+//	                		var msgData = {payload: diState};
+//	                		diStateOld = diState;
+//		                	node.send(msgData);
+//	                	}
+	                	
 	            	}
-	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_SENROR)
+	                else if(pwm_data.getValue(1) === ErrEnum.eNODE_ERR_SENROR)
 	            	{
-	                	node.status({fill:"yellow",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Error"});                	
+	                	node.status({fill:"yellow",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Error"});                	
 	            	}	                
-	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_COMMUNICATION)
+	                else if(pwm_data.getValue(1) === ErrEnum.eNODE_ERR_COMMUNICATION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Error"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Error"});
 	            	}
-	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION)
+	                else if(pwm_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Not connected"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Not connected"});
 	            	}
-	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_NETWORK)
+	                else if(pwm_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_NETWORK)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Wrong Network"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Wrong Network"});
 	            	}
-	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_DEVICE)
+	                else if(pwm_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_DEVICE)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Wrong Node-ID"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Wrong Node-ID"});
 	            	}
-	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_CHANNEL)
+	                else if(pwm_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_CHANNEL)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Wrong Channel"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Wrong Channel"});
 	            	}
 	                
 	    		};
 	    }
-		
-        input(msg) 
-        {
-        	client.send(msg.payload);
-        }
 		
         //---------------------------------------------------------------------------------------------
         // runs when node is closed (before deploy, e.g. to tidy up)
         //---------------------------------------------------------------------------------------------
         close()
         {
-        	do_socket.disconnect_ws();
-        	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Not connected"});
+        	pwm_socket.disconnect_ws();
+        	node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Not connected"});
         }
 
     }
     
-    RED.nodes.registerType("mcan-8dio out", MCAN8Do);
+    RED.nodes.registerType("mcan-8pwm", MCAN8Pwm);
 }
