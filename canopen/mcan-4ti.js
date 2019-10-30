@@ -50,22 +50,21 @@ module.exports = function(RED) {
 	        node = this;  
            this.on('close', this.close);
 	        
-	        this.canBus        = config.canBus;
-	        this.nodeId        = config.nodeId;
-	        this.moduleChannel = config.moduleChannel;
-	        this.productCode   = config.productCode;
-	        this.sensorType    = config.sensorType;
+           node.canBus        = config.canBus;
+           node.nodeId        = config.nodeId;
+           node.moduleChannel = config.moduleChannel;
+           node.productCode   = config.productCode;
+           node.sensorType    = config.sensorType;
 	
 	        //create Buffer for rcv Data
 	        var ti_data = new NodeData();
 	        
 	        //creat id String
 			  var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 
-																	14, moduleProductCode , moduleRevisionNumber, moduledeviceType, 
-																	this.sensorType);
+																	14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
 	        //add specific string
 			  var idString = identification.getIdString();
-			  idString = idString + "sensor-type: "    + config.sensorType	   + ";";
+			  idString = idString + "sensor-type: "    + node.sensorType	   + ";";
 			
 			
 	        //open socket

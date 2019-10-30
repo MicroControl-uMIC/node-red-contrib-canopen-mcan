@@ -54,10 +54,10 @@
         <label for="node-input-moduleChannel"><i class="fa fa-thermometer-quarter"></i> <span data-i18n="mcan-4ai.labelInpNum"></span></label>
         <select type="text" id="node-input-moduleChannel" style="width:200px; display:inline-block">
             <option>keine Auswahl</option>
-            <option>Kanal 1</option>
-            <option>Kanal 2</option>
-            <option>Kanal 3</option>
-            <option>Kanal 4</option>
+            <option value="1", data-i18n="mcan-4ti.optionCh1"></option>
+            <option value="2", data-i18n="mcan-4ti.optionCh2"></option>
+            <option value="3", data-i18n="mcan-4ti.optionCh3"></option>
+            <option value="4", data-i18n="mcan-4ti.optionCh4"></option>
        </select>
     </div>
 
@@ -65,8 +65,8 @@
        <label for="node-input-sensorType"> <span data-i18n="mcan-4ai.labelInpTyp"></span> </label>
        <select type="text" id="node-input-sensorType" style="width:200px; display:inline-block">
             <option>keine Auswahl</option>
-            <option>0..10V</option>
-            <option>0..24mA</option>
+            <option value="42">0..10V</option>
+            <option value="51">0..20mA</option>
        </select>   
     </div>
 	 </div>
@@ -74,13 +74,13 @@
     <script>
             $("#node-input-moduleChannel").change(function() {
                 var checkCh = $("#node-input-moduleChannel").val();
-             if (checkCh === "Kanal 1") {
+             if (checkCh === "1") {
                  $(".node-input-sensorType").show();
-             } else if (checkCh === "Kanal 2") {
+             } else if (checkCh === "2") {
                  $(".node-input-sensorType").show();
-             } else if (checkCh === "Kanal 3") {
+             } else if (checkCh === "3") {
                  $(".node-input-sensorType").show();
-             } else if (checkCh === "Kanal 4") {
+             } else if (checkCh === "4") {
                  $(".node-input-sensorType").show();
              } 
               else {

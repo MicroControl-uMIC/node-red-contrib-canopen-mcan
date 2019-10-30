@@ -1,10 +1,11 @@
 {
-    "mcan-8di" : {
+    "mcan-8pwm" : {
         "labelName"   : "Name",
         "labelCanCh"  : "CAN channel",
         "labelNodeId" : "Node ID",
-        "labelInpSel" : "Select input channel",
-        "labelInpNum" : "Input",
+        "labelOutSel" : "Select output channel",
+        "labelOutNum" : "Output",
+        "labelModFreq": "Base frequency",
         "optionCh1" : "Channel 1",
         "optionCh2" : "Channel 2",
         "optionCh3" : "Channel 3",

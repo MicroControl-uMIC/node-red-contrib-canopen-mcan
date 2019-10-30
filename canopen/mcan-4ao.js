@@ -13,11 +13,9 @@ const DeviceIdString  = require("./core/id_string");
 const WsComet = require("./core/websocket_comet.js");
 const NodeData  = require("./core/node_data.js");
 
-const modProdCode = "12.86.014";
-
-const modRevNr = "v2";
-
-const deviceType = 131476;
+const moduledeviceType     = 524692;
+const moduleProductCode    = 1242003;
+const moduleRevisionNumber = 0;
 
 var ao_socket;
 
@@ -49,21 +47,24 @@ module.exports = function(RED) {
 	        // runs when flow is deployed
 	        //---------------------------------------------------------------------------------------------
 	        node = this;  
-            this.on('close', this.close);
-            this.on('input', this.input);
+	        node.on('close', this.close);
+	        node.on('input', this.input);
 	        
-	        this.nodeId=config.nodeId;
-	        this.productCode=config.productCode;
-	        this.canBus=config.canBus;
-	        this.moduleChannel=config.moduleChannel;
-	        this.sensorType=config.sensorType;
+	        node.nodeId 		= config.nodeId;
+	        node.productCode 	= config.productCode;
+	        node.canBus 		= config.canBus;
+	        node.moduleChannel 	= config.moduleChannel;
+	        node.sensorType 	= config.sensorType;
 	
 	        //create Buffer for rcv Data
 	        var ao_data = new NodeData();
 	        
-	        //creat id String
-	        var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 12, modProdCode , modRevNr, deviceType, this.sensorType);
-	        
+	      //creat id String
+			  var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 
+																	14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
+	        //add specific string
+			  var idString = identification.getIdString();
+			  idString = idString + "sensor-type: "    + node.sensorType	   + ";";
 	        //open socket
 	        ao_socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);       
 	        

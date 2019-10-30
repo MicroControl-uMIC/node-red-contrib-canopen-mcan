@@ -8,7 +8,7 @@
 
 class DeviceIdString {
 
-    constructor(canBus, nodeId, moduleChannel, vendorId, productCode, revisionNumber, deviceType, sensorType) 
+    constructor(canBus, nodeId, moduleChannel, vendorId, productCode, revisionNumber, deviceType) 
     {
 
     	this.canBus         = canBus;
@@ -18,7 +18,6 @@ class DeviceIdString {
     	this.productCode    = productCode;
     	this.revisionNumber = revisionNumber;
     	this.deviceType     = deviceType;
-    	this.sensorType     = sensorType;
     }
     
     

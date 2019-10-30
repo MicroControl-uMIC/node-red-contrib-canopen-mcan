@@ -51,21 +51,21 @@ module.exports = function(RED) {
 	        // runs when flow is deployed
 	        //---------------------------------------------------------------------------------------------
 	        node = this;  
-            this.on('close', this.close);
+	        node.on('close', this.close);
+	        node.on('input', this.input);
 	        
-	        this.nodeId=config.nodeId;
-	        this.productCode=config.productCode;
-	        this.canBus=config.canBus;
-	        this.moduleChannel=config.moduleChannel;
-	        this.moduleFreq = config.moduleFreq;
+	        node.nodeId 		= config.nodeId;
+	        node.productCode 	= config.productCode;
+	        node.canBus 		= config.canBus;
+	        node.moduleChannel  = config.moduleChannel;
+	        node.moduleFreq 	= config.moduleFreq;
 	
 	        //create Buffer for rcv Data
 	        var pwm_data = new NodeData();
 	        
 	        //creat id String
 	        var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 
-					14, moduleProductCode , moduleRevisionNumber, moduledeviceType, 
-					this.sensorType);
+					14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
 	        
 	        //add specific string
 	        var idString = identification.getIdString();
@@ -100,16 +100,7 @@ module.exports = function(RED) {
 	                if(pwm_data.getValue(1) === ErrEnum.eNODE_ERR_NONE)
 	            	{
 	                	node.status({fill:"green",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] OK"});
-	                	
-//	                	var diState = pwm_data.getValue(0);
-//
-//	                	if(diState != diStateOld)
-//	                	{
-//	                		var msgData = {payload: diState};
-//	                		diStateOld = diState;
-//		                	node.send(msgData);
-//	                	}
-	                	
+
 	            	}
 	                else if(pwm_data.getValue(1) === ErrEnum.eNODE_ERR_SENROR)
 	            	{
@@ -138,6 +129,11 @@ module.exports = function(RED) {
 	                
 	    		};
 	    }
+		
+        input(msg) 
+        {
+        	client.send(msg.payload);
+        }
 		
         //---------------------------------------------------------------------------------------------
         // runs when node is closed (before deploy, e.g. to tidy up)

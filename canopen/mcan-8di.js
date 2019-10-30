@@ -13,19 +13,15 @@ const DeviceIdString  = require("./core/id_string");
 const WsComet = require("./core/websocket_comet.js");
 const NodeData  = require("./core/node_data.js");
 
-const modProdCode = "12.43.005";
-
-const modRevNr = "v2";
-
-const deviceType = 131476;
+const moduledeviceType     = 197009;
+const moduleProductCode    = 1286014;
+const moduleRevisionNumber = 2;
 
 var di_socket;
 
 var diStateOld = false;
 
 var node;
-
-const sensorType = "input";
 
 const ErrEnum = 
 {
@@ -53,18 +49,19 @@ module.exports = function(RED) {
 	        // runs when flow is deployed
 	        //---------------------------------------------------------------------------------------------
 	        node = this;  
-            this.on('close', this.close);
+	        node.on('close', this.close);
 	        
-	        this.nodeId=config.nodeId;
-	        this.productCode=config.productCode;
-	        this.canBus=config.canBus;
-	        this.moduleChannel=config.moduleChannel;
+	        node.nodeId 		= config.nodeId;
+	        node.productCode 	= config.productCode;
+	        node.canBus 		= config.canBus;
+	        node.moduleChannel  = config.moduleChannel;
 	
 	        //create Buffer for rcv Data
 	        var di_data = new NodeData();
 	        
 	        //creat id String
-	        var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 12, modProdCode , modRevNr, deviceType, sensorType);
+	        var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 
+					14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
 	        
 	         //add specific string
 	        var idString = identification.getIdString();
