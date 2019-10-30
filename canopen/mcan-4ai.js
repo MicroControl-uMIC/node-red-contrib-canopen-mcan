@@ -73,8 +73,8 @@ module.exports = function(RED) {
 			client.onopen = function()
 			{
 				//send identification string upon socket connection
-	    	    console.log(identification.getIdString());
-				client.send(identification.getIdString());
+	    	    console.log(idString);
+				client.send(idString);
 			};
 			
 	    	client.onclose = function() 
