@@ -47,8 +47,8 @@ module.exports = function(RED) {
 	        // runs when flow is deployed
 	        //---------------------------------------------------------------------------------------------
 	        node = this;  
-	        node.on('close', this.close);
-	        node.on('input', this.input);
+	        node.on('close', node.close);
+	        node.on('input', node.input);
 	        
 	        node.nodeId 		= config.nodeId;
 	        node.productCode 	= config.productCode;
@@ -59,7 +59,7 @@ module.exports = function(RED) {
 	        var do_data = new NodeData();
 	        
 	        //creat id String
-	        var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 
+	        var identification = new DeviceIdString(node.canBus, node.nodeId, node.moduleChannel, 
 					14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
 	      //add specific string
 	        var idString = identification.getIdString();
@@ -68,7 +68,7 @@ module.exports = function(RED) {
 			"error-value: 0"+ ";";
 			
 	        //open socket
-	        do_socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);       
+	        do_socket = new WsComet(node.canBus, node.nodeId, node.moduleChannel);       
 	        
 			var client = do_socket.connect_ws();
 	        

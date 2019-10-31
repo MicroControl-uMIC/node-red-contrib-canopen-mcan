@@ -59,14 +59,14 @@ module.exports = function(RED) {
 	        var ai_data = new NodeData();
 	        
 	        //creat id String
-			var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 
+			var identification = new DeviceIdString(node.canBus, node.nodeId, node.moduleChannel, 
 																	14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
 	        //add specific string
 			var idString = identification.getIdString();
 			idString = idString + "sensor-type: "    + node.sensorType	   + ";";
 			  
 	        //open socket
-	        ai_socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);       
+	        ai_socket = new WsComet(node.canBus, node.nodeId, node.moduleChannel);       
 	        
 			var client = ai_socket.connect_ws();
 	        
@@ -96,7 +96,8 @@ module.exports = function(RED) {
 	                	node.status({fill:"green",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] OK"});
 	                	
 	                	var scaledData = ai_data.getValue(0) / 10;
-	                	var msgData = {payload: scaledData };
+	                	var msgData = {payload: scaledData ,
+	                				   topic: "mcan4ai/" + node.moduleChannel};
 	
 	                	node.send(msgData);
 	                	

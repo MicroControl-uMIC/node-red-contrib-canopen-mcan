@@ -48,7 +48,7 @@ module.exports = function(RED) {
 	        // runs when flow is deployed
 	        //---------------------------------------------------------------------------------------------
 	        node = this;  
-           this.on('close', this.close);
+           node.on('close', node.close);
 	        
            node.canBus        = config.canBus;
            node.nodeId        = config.nodeId;
@@ -60,15 +60,15 @@ module.exports = function(RED) {
 	        var ti_data = new NodeData();
 	        
 	        //creat id String
-			  var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 
+			  var identification = new DeviceIdString(node.canBus, node.nodeId, node.moduleChannel, 
 																	14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
 	        //add specific string
 			  var idString = identification.getIdString();
-			  idString = idString + "sensor-type: "    + node.sensorType	   + ";";
+			  idString = idString + "sensor-type: "    + node.sensorType + ";";
 			
 			
 	        //open socket
-	        ti_socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);       
+	        ti_socket = new WsComet(node.canBus, node.nodeId, node.moduleChannel);       
 	        
 			var client = ti_socket.connect_ws();
 	        
@@ -98,7 +98,9 @@ module.exports = function(RED) {
 	                	node.status({fill:"green",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] OK"});
 	                	
 	                	var scaledData = ti_data.getValue(0) / 10;
-	                	var msgData = {payload: scaledData };
+	                	var msgData = {payload: scaledData ,
+             				           topic: "mcan4ti/" + node.moduleChannel};
+	                	
 	
 	                	node.send(msgData);
 	                	

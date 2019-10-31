@@ -49,7 +49,7 @@ module.exports = function(RED) {
 	        // runs when flow is deployed
 	        //---------------------------------------------------------------------------------------------
 	        node = this;  
-	        node.on('close', this.close);
+	        node.on('close', node.close);
 	        
 	        node.nodeId 		= config.nodeId;
 	        node.productCode 	= config.productCode;
@@ -60,7 +60,7 @@ module.exports = function(RED) {
 	        var di_data = new NodeData();
 	        
 	        //creat id String
-	        var identification = new DeviceIdString(this.canBus, this.nodeId, this.moduleChannel, 
+	        var identification = new DeviceIdString(node.canBus, node.nodeId, node.moduleChannel, 
 					14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
 	        
 	         //add specific string
@@ -68,7 +68,7 @@ module.exports = function(RED) {
 	        idString = idString + "port-direction: 0"+ ";"; 
 	        
 	        //open socket
-	        di_socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);       
+	        di_socket = new WsComet(node.canBus, node.nodeId, node.moduleChannel);       
 	        
 			var client = di_socket.connect_ws();
 	        
@@ -101,7 +101,8 @@ module.exports = function(RED) {
 
 	                	if(diState != diStateOld)
 	                	{
-	                		var msgData = {payload: diState};
+		                	var msgData = {payload: diState ,
+	                				       topic: "mcan8dio/" + node.moduleChannel};
 	                		diStateOld = diState;
 		                	node.send(msgData);
 	                	}
