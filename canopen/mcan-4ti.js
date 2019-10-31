@@ -77,6 +77,7 @@ module.exports = function(RED) {
 				//send identification string upon socket connection
 	    	    console.log(idString);
 				client.send(idString);
+				node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
 			};
 			
 	    	client.onclose = function() 

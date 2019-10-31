@@ -48,19 +48,19 @@ class WsComet{
     {
     	var channelId;
     	
-    	if(this.modCh === "Kanal 1")
+    	if(this.modCh === "1")
     	{
     		channelId = "1";
     	}
-    	else if(this.modCh === "Kanal 2")
+    	else if(this.modCh === "2")
     	{
     		channelId = "2";
     	}
-    	else if(this.modCh === "Kanal 3")
+    	else if(this.modCh === "3")
     	{
     		channelId = "3";
     	}
-    	else if(this.modCh === "Kanal 4")
+    	else if(this.modCh === "4")
     	{
     		channelId = "4";
     	}
