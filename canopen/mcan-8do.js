@@ -12,6 +12,7 @@
 const DeviceIdString  = require("./core/id_string");
 const WsComet = require("./core/websocket_comet.js");
 const NodeData  = require("./core/node_data.js");
+const NodeErrorEnum	  = require("./core/node_error.js");
 
 const moduledeviceType     = 197009;
 const moduleProductCode    = 1286014;
@@ -93,31 +94,31 @@ module.exports = function(RED) {
 	    			do_data.setBuffer(event.data, 32);
 	       
 	                //check Status Variable
-	                if(do_data.getValue(1) === ErrEnum.eNODE_ERR_NONE)
+	                if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
 	            	{
 	                	node.status({fill:"green",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] OK"});	                	
 	            	}
-	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_SENROR)
+	                else if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
 	            	{
 	                	node.status({fill:"yellow",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Error"});                	
 	            	}	                
-	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_COMMUNICATION)
+	                else if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_COMMUNICATION)
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Error"});
 	            	}
-	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION)
+	                else if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION)
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Not connected"});
 	            	}
-	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_NETWORK)
+	                else if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK)
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Wrong Network"});
 	            	}
-	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_DEVICE)
+	                else if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_DEVICE)
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Wrong Node-ID"});
 	            	}
-	                else if(do_data.getValue(1) === ErrEnum.eNODE_ERR_CONNECTION_CHANNEL)
+	                else if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_CHANNEL)
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Wrong Channel"});
 	            	}
