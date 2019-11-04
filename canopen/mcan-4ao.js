@@ -120,6 +120,10 @@ module.exports = function(RED) {
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+ao_socket.getChannelUrl()+"] Wrong Channel"});
 	            	}
+	                else if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION)
+	            	{
+	                	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Wrong device identification"});
+	            	}
 	                
 	    		};
 	    }
