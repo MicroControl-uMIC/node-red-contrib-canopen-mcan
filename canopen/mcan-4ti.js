@@ -73,8 +73,6 @@ module.exports = function(RED) {
 			{
 				//send identification string upon socket connection
 				console.log(idString);
-				console.log(client.url);
-				console.log(" CHANNEL onopen: " + moduleChannel);
 				client.send(idString);
 			};
 			
@@ -89,10 +87,6 @@ module.exports = function(RED) {
 	    	{
 					ti_data.setBuffer(event.data, 32);
 
-					console.log(" CHANNEL onrcv: " + moduleChannel+ " TEMP DATA: "+ ti_data.getValue(0));
-					
-					console.log("RCV DATA: " + ti_data.getValue(1) + " CHANNEL: " + ti_socket.getChannelUrl() + " URL: "+  client.url);
-	       
 	                //check Status Variable
 	                if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
 	            	{
