@@ -26,16 +26,6 @@ var node;
 
 const sensorType = "input";
 
-const ErrEnum = 
-{
-	eNODE_ERR_NONE: 0,
-	eNODE_ERR_SENSOR: -10,
-	eNODE_ERR_COMMUNICATION: -20,
-	eNODE_ERR_CONNECTION: -30,
-	eNODE_ERR_CONNECTION_NETWORK: -31,
-	eNODE_ERR_CONNECTION_DEVICE: -32,
-	eNODE_ERR_CONNECTION_CHANNEL: -33
-};
 //-----------------------------------------------------------------------------------------------------
 // define variables here
 //-----------------------------------------------------------------------------------------------------

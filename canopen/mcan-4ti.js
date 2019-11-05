@@ -19,20 +19,8 @@ const moduleProductCode    = 1243005;
 const moduleRevisionNumber = 1;
 
 
-var ti_socket;
 
-var node;
 
-//const ErrEnum = 
-//{
-//	eNODE_ERR_NONE: 0,
-//	eNODE_ERR_SENSOR: -10,
-//	eNODE_ERR_COMMUNICATION: -20,
-//	eNODE_ERR_CONNECTION: -30,
-//	eNODE_ERR_CONNECTION_NETWORK: -31,
-//	eNODE_ERR_CONNECTION_DEVICE: -32,
-//	eNODE_ERR_CONNECTION_CHANNEL: -33
-//};
 //-----------------------------------------------------------------------------------------------------
 // define variables here
 //-----------------------------------------------------------------------------------------------------
@@ -48,38 +36,45 @@ module.exports = function(RED) {
 	       //---------------------------------------------------------------------------------------------
 	       // runs when flow is deployed
 	       //---------------------------------------------------------------------------------------------
-	       node = this;  
+	       var node = this;  
            node.on('close', node.close);
-	        
-           node.canBus        = config.canBus;
-           node.nodeId        = config.nodeId;
-           node.moduleChannel = config.moduleChannel;
-           node.productCode   = config.productCode;	
-           node.sensorType    = config.sensorType;
-	
-           //var ErrEnum = new NodeError;
+		 //  var node;
+
+         //  node.canBus        = config.canBus;
+         //  node.nodeId        = config.nodeId;
+         //  node.moduleChannel = config.moduleChannel;
+         //  node.productCode   = config.productCode;	
+		 //  node.sensorType    = config.sensorType;
+		   var ti_socket;
+           var canBus        = config.canBus;
+           var nodeId        = config.nodeId;
+           var moduleChannel = config.moduleChannel;
+           var productCode   = config.productCode;	
+		   var sensorType    = config.sensorType;
+
 	        //create Buffer for rcv Data
 	        var ti_data = new NodeData();
 	        
 	        //var errEnum = NodeError.NodeErrorEnum;
 	        
 	        //creat id String
-			  var identification = new DeviceIdString(node.canBus, node.nodeId, node.moduleChannel, 
+			  var identification = new DeviceIdString(canBus, nodeId, moduleChannel, 
 																	14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
 	        //add specific string
 			  var idString = identification.getIdString();
-			  idString = idString + "sensor-type: "    + node.sensorType + ";";
+			  idString = idString + "sensor-type: "    + sensorType + ";";
 			
-			console.log("ERR CODE: "+ NodeErrorEnum.eNODE_ERR_SENSOR);
 	        //open socket
-	        ti_socket = new WsComet(node.canBus, node.nodeId, node.moduleChannel);       
+	        ti_socket = new WsComet(canBus, nodeId, moduleChannel);       
 	        
 			var client = ti_socket.connect_ws();
 	        
 			client.onopen = function()
 			{
 				//send identification string upon socket connection
-	    	    console.log(idString);
+				console.log(idString);
+				console.log(client.url);
+				console.log(" CHANNEL onopen: " + moduleChannel);
 				client.send(idString);
 			};
 			
@@ -92,9 +87,11 @@ module.exports = function(RED) {
 	        //gets executed when socket receives a message	
 	    	client.onmessage = function (event) 
 	    	{
-	    			//console.log("msg received");
-	
-	    			ti_data.setBuffer(event.data, 32);
+					ti_data.setBuffer(event.data, 32);
+
+					console.log(" CHANNEL onrcv: " + moduleChannel+ " TEMP DATA: "+ ti_data.getValue(0));
+					
+					console.log("RCV DATA: " + ti_data.getValue(1) + " CHANNEL: " + ti_socket.getChannelUrl() + " URL: "+  client.url);
 	       
 	                //check Status Variable
 	                if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
@@ -103,10 +100,10 @@ module.exports = function(RED) {
 	                	
 	                	var scaledData = ti_data.getValue(0) / 10;
 	                	var msgData = {payload: scaledData ,
-             				           topic: "mcan4ti/" + node.moduleChannel};
+             				           topic: "mcan4ti/" + moduleChannel};
 	                	
 	
-	                	node.send(msgData);
+						node.send(msgData);
 	                	
 	            	}
 	                else if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
@@ -146,8 +143,10 @@ module.exports = function(RED) {
         //---------------------------------------------------------------------------------------------
         close()
         {
-        	ti_socket.disconnect_ws();
-        	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
+			var socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);  
+
+        	socket.disconnect_ws();
+        	//node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
         }
 
     }

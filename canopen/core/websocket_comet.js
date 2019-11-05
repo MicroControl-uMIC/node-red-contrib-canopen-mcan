@@ -74,19 +74,20 @@ class WsComet{
     
     connect_ws()
     {
-        var canUrl = this.getCanUrl();
-        var chUrl = this.getChannelUrl();
+        //var canUrl = this.getCanUrl();
+       // var chUrl = this.getChannelUrl();
     	
     	var socketUrl = wsUrl + this.canCh + "/" + this.nodeId + "/" + this.modCh;
     	
     	client = new W3CWebSocket(socketUrl);
         
         return client;
-    }
-    
+	}
+
     disconnect_ws()
     {
-        client.close();
+		var socketUrl = wsUrl + this.canCh + "/" + this.nodeId + "/" + this.modCh;
+        client.close(socketUrl);
     }
 
 }
