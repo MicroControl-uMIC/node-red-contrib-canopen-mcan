@@ -1,0 +1,96 @@
+<!-- for detailed information: https://nodered.org/docs/creating-nodes/node-html -->
+
+<script type="text/javascript">
+    RED.nodes.registerType('mcan-ao',{
+        category: 'CANopen',
+        color: '#FFCC66',
+        defaults: {
+            nodeId: {value: ""},
+            productCode: {value: "12.42.004"},
+            sensorType: {value: ""},
+            moduleChannel: {value: ""},
+            canBus: {value: ""},
+            deviceName: {value: "µCAN.4.ao"}
+        },
+        oneditprepare: function() {
+            $('.editor-tray-content').css({"width" : 400 +  "px"});
+        },
+        inputs:1,
+        inputLabels: ["Input"],
+        icon: "font-awesome/sign-out",
+        align: 'right',
+        label: function() {
+	    return this.name || "µCAN.4.ao";}
+    });
+</script>
+
+<script type="text/x-red" data-template-name="mcan-ao">
+
+    <p align="left"><strong>µCAN.4.ao-BOX </strong></p>
+
+    <img src="/node-red-contrib-canopen-mcan/icons/mcan-4xi.png" alt="µCAN.4.ai" style="width:257px;height:208px;align="middle">
+
+    <div class="form-row">
+        <label for="node-input-deviceName"> <span data-i18n="mcan-ai.labelName"></span> </label>
+        <input type="text" id="node-input-name" style="width:200px; display:inline-block"> 
+    </div>
+
+    
+    <div class="form-row">
+        <label for="node-input-canBus"><span data-i18n="mcan-ai.labelCanCh"></span> </label>
+        <select type="text" id="node-input-canCh" style="width:200px; display:inline-block">
+            <option value="1">CAN 1</option>
+            <option value="2">CAN 2</option>
+       </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-nodeId"><span data-i18n="mcan-ai.labelNodeId"></span> </label>
+        <input type="number" id="node-input-nodeID" style="width:200px; display:inline-block" max="126" min="1"> 
+    </div>
+
+	 <div class="mcan-input">
+    <p align="left" style="margin-left:70px"><span data-i18n="mcan-ai.labelInpSel"></span></p>
+
+    <div class="form-row">
+        <label for="node-input-moduleChannel"><i class="fa fa-thermometer-quarter"></i> <span data-i18n="mcan-ai.labelInpNum"></span></label>
+        <select type="text" id="node-input-checkCh" style="width:200px; display:inline-block">
+            <option value="0", data-i18n="mcan-ao.noOption"></option>
+            <option value="1", data-i18n="mcan-ao.optionCh1"></option>
+            <option value="2", data-i18n="mcan-ao.optionCh2"></option>
+            <option value="3", data-i18n="mcan-ao.optionCh3"></option>
+            <option value="4", data-i18n="mcan-ao.optionCh4"></option>
+       </select>
+    </div>
+
+    <div class="form-row node-input-sensorType">
+       <label for="node-input-sensorType"> <span data-i18n="mcan-ai.labelInpTyp"></span> </label>
+       <select type="text" id="node-input-sensorType" style="width:200px; display:inline-block">
+            <option value="0", data-i18n="mcan-ao.noOption"></option>
+            <option value="42">0..10V</option>
+            <option value="51">0..20mA</option>
+       </select>   
+    </div>
+	 </div>
+	 
+    <script>
+            $("#node-input-moduleChannel").change(function() {
+                var checkCh = $("#node-input-moduleChannel").val();
+             if (checkCh === "1") {
+                 $(".node-input-sensorType").show();
+             } else if (checkCh === "2") {
+                 $(".node-input-sensorType").show();
+             } else if (checkCh === "3") {
+                 $(".node-input-sensorType").show();
+             } else if (checkCh === "4") {
+                 $(".node-input-sensorType").show();
+             } 
+              else {
+                 $(".node-input-sensorType").hide();
+                 document.getElementById("node-input-moduleChannel").selectedIndex = "0";
+             }
+            }); 
+    </script>
+
+</script>
+

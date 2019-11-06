@@ -1,0 +1,22 @@
+{
+    "mcan-ti" : {
+        "labelName"   : "Name",
+        "labelCanCh"  : "CAN channel",
+        "labelNodeId" : "Node ID",
+        "labelInpSel" : "Select input channel",
+        "labelInpNum" : "Input",
+        "labelInpTyp" : "Signal type",
+        "noOption"  : "Not selected",
+        "optionCh1" : "Channel 1",
+        "optionCh2" : "Channel 2",
+        "optionCh3" : "Channel 3",
+        "optionCh4" : "Channel 4",
+        "optionThJ" : "Thermocouple (Type J)",
+        "optionThK" : "Thermocouple (Type K)",
+        "optionThL" : "Thermocouple (Type L)",
+        "optionThN" : "Thermocouple (Type N)",
+        "optionPt100" : "Pt100",
+        "optionPt500" : "Pt500",
+        "optionPt1000" : "Pt1000"
+    }
+}

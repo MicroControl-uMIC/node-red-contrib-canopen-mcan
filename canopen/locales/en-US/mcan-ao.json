@@ -1,0 +1,16 @@
+{
+    "mcan-ao" : {
+        "labelName"   : "Name",
+        "labelCanCh"  : "CAN channel",
+        "labelNodeId" : "Node ID",
+        "labelOutSel" : "Select output channel",
+        "labelOutNum" : "Input",
+        "labelOutTyp" : "Signal type",
+        "labelOutVal" : "Value",
+        "noOption"  : "Not selected",
+        "optionCh1" : "Channel 1",
+        "optionCh2" : "Channel 2",
+        "optionCh3" : "Channel 3",
+        "optionCh4" : "Channel 4"
+    }
+}

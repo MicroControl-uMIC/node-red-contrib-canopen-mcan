@@ -1,0 +1,26 @@
+<!-- Help text, for detailed information: https://nodered.org/docs/creating-nodes/help-style-guide -->
+
+<script type="text/x-red" data-help-name="mcan-ao" lang="en-US">
+<p>Analoger Eingang eines µCAN.4.ao Moduls</p>
+
+<h3>Eingaben</h3>
+    <ol class="node-ports">
+        <dl class="message-properties">
+            <dt>payload <span class="property-type">Number</span></dt>
+                 <dd>To set the analogue outputs only messages of the <code>int32</code> type are accepted.
+                 Valid values for voltages are 0-10000 (voltage with 3 decimal digits).
+                 Valid values for currents are 0-20000 (current with 3 decimal digits).
+                 </dd>
+             </dl>
+     </ol>
+
+<p>
+<h3>Details</h3>
+    <p>
+    The node accepts <code>msg.payload</code> of the <code>Number</code> type. To set voltages only values
+    within 0-10000 range are valid. To set currents only values within 0-20000 range are valid.
+    According to this message the analogue output is set.
+	</p>
+
+    <p>Dieser Knoten bildet ein µCAN.4.ao Modul von MicroControl ab.</p>
+</script>

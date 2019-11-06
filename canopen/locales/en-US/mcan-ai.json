@@ -1,0 +1,15 @@
+{
+    "mcan-ai" : {
+        "labelName"   : "Name",
+        "labelCanCh"  : "CAN channel",
+        "labelNodeId" : "Node ID",
+        "labelInpSel" : "Select input channel",
+        "labelInpNum" : "Input",
+        "labelInpTyp" : "Signal type",
+        "noOption"  : "Not selected",
+        "optionCh1" : "Channel 1",
+        "optionCh2" : "Channel 2",
+        "optionCh3" : "Channel 3",
+        "optionCh4" : "Channel 4"
+    }
+}

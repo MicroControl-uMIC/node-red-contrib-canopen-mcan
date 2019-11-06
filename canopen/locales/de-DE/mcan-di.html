@@ -1,0 +1,28 @@
+<!-- Help text, for detailed information: https://nodered.org/docs/creating-nodes/help-style-guide -->
+
+<script type="text/x-red" data-help-name="mcan-dio in" lang="de-DE">
+<p>Digitaler Eingang eines µCAN.8.dio Moduls</p>
+
+<h3>Ausgaben</h3>
+    <ol class="node-ports">
+        <dl class="message-properties">
+            <dt>payload <span class="property-type">Boolescher Wert</span></dt>
+                 <dd>Die Nutzdaten sind <code>false</code> bei einer logischen 0 am Eingang bzw. 
+                     <code>true</code> bei einer logischen 1 am Eingang.</dd>
+             </dl>
+        <dl class="message-properties">
+            <dt>topic <span class="property-type">Zeichenfolge</span></dt>
+                 <dd>Das Topic wird auf <code>mcan8di/{inputNumber}</code> gesetzt.<br></dd>
+             </dl>
+     </ol>
+
+<p>
+<h3>Details</h3>
+    <p>
+    Der Knoten generiert eine <code>msg.payload</code> mit einem Wert von <code>true</code> oder 
+    <code>false</code> in Abhängigkeit vom Status des digitalen Eingangs. Der Knoten generiert
+    nur eine Nachricht wenn sich der Status des digitalen Eingangs ändert.
+	</p>
+
+    <p>Dieser Knoten bildet ein µCAN.8.dio Modul von MicroControl ab.</p>
+</script>

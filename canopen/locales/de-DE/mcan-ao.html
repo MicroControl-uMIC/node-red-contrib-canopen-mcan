@@ -1,0 +1,26 @@
+<!-- Help text, for detailed information: https://nodered.org/docs/creating-nodes/help-style-guide -->
+
+<script type="text/x-red" data-help-name="mcan-ao" lang="de-DE">
+<p>Analoger Eingang eines µCAN.4.ao Moduls</p>
+
+<h3>Eingaben</h3>
+    <ol class="node-ports">
+        <dl class="message-properties">
+            <dt>payload <span class="property-type">Zahl</span></dt>
+                 <dd>Zum Einstellen der analogen Ausgabe werden <code>Zahl</code> Werte erwartet. Für Spannungen
+                 werden Werte von 0-10000 unterstützt.(Spannung mit 3 Nachkommastelle)
+                 
+                 Für Ströme werden Werte von 0-20000 unterstützt.(Strom mit 3 Nachkommastellen)</dd>
+             </dl>
+     </ol>
+
+<p>
+<h3>Details</h3>
+    <p>
+    Der Knoten akzeptiert eine <code>msg.payload</code> mit einem <code>Zahl</code> Wert im Bereich von
+    0-10000(Spannung) oder 0-20000(Strom). Entsprechend der Nachricht wird der analoge Ausgang auf den entsprechenden Wert
+    gesetzt.
+	</p>
+
+    <p>Dieser Knoten bildet ein µCAN.4.ao Modul von MicroControl ab.</p>
+</script>

@@ -1,0 +1,22 @@
+<!-- Help text, for detailed information: https://nodered.org/docs/creating-nodes/help-style-guide -->
+
+<script type="text/x-red" data-help-name="mcan-dio out" lang="de-DE">
+<p>Digital output of a µCAN.8.dio module</p>
+
+<h3>Eingaben</h3>
+    <ol class="node-ports">
+        <dl class="message-properties">
+            <dt>payload <span class="property-type">Boolean</span></dt>
+                 <dd>To drive the output only values of <code>true</code> or <code>false</code> are accepted.</dd>
+        </dl>
+     </ol>
+
+<p>
+<h3>Details</h3>
+The node only accepts a <code>msg.payload</code> with the <code>Boolean</code> type. 
+The value <code>true</code> sets the output to a high level. The value <code>false</code> sets the output to a 
+low level.
+The state of the output can be observed by a node of the type <code>umic-dio in</code>.
+
+    <p>This node simulates a µCAN.8.dio module of MicroControl.</p>
+</script>

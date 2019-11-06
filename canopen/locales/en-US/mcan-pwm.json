@@ -1,0 +1,19 @@
+{
+    "mcan-pwm" : {
+        "labelName"   : "Name",
+        "labelCanCh"  : "CAN channel",
+        "labelNodeId" : "Node ID",
+        "labelOutSel" : "Select output channel",
+        "labelOutNum" : "Output",
+        "labelModFreq": "Base frequency",
+        "noOption"  : "Not selected",
+        "optionCh1" : "Channel 1",
+        "optionCh2" : "Channel 2",
+        "optionCh3" : "Channel 3",
+        "optionCh4" : "Channel 4",
+        "optionCh5" : "Channel 5",
+        "optionCh6" : "Channel 6",
+        "optionCh7" : "Channel 7",
+        "optionCh8" : "Channel 8"
+    }
+}

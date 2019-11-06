@@ -1,0 +1,26 @@
+<!-- Help text, for detailed information: https://nodered.org/docs/creating-nodes/help-style-guide -->
+
+<script type="text/x-red" data-help-name="mcan-ti" lang="en-US">
+<p>Analogue input of a µCAN.4.ti module</p>
+
+<h3>Outputs</h3>
+    <ol class="node-ports">
+        <dl class="message-properties">
+            <dt>payload <span class="property-type">Number</span></dt>
+                 <dd>The payload reflects the temperature value at chosen input channel.</dd>
+             </dl>
+        <dl class="message-properties">
+            <dt>topic <span class="property-type">String</span></dt>
+                 <dd>The topic is set to <code>mcan4ti/{inputNumber}</code>.<br></dd>
+             </dl>
+     </ol>
+
+<p>
+<h3>Details</h3>
+    <p>
+    The node generates a <code>msg.payload</code> showing the temperature value at the chosen input channel.
+    The node generates a message every 100ms.
+	</p>
+
+    <p>This node simulates a µCAN.4.ti from MicroControl</p>
+</script>

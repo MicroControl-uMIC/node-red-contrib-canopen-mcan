@@ -13,12 +13,12 @@
   },
   "node-red": {
     "nodes": {
-      "mcan-4ai": "canopen/mcan-4ai.js",
-      "mcan-4ao": "canopen/mcan-4ao.js",
-      "mcan-4ti": "canopen/mcan-4ti.js",
-      "mcan-8di": "canopen/mcan-8di.js",
-      "mcan-8do": "canopen/mcan-8do.js",
-      "mcan-8pwm": "canopen/mcan-8pwm.js"
+      "mcan-ai": "canopen/mcan-ai.js",
+      "mcan-ao": "canopen/mcan-ao.js",
+      "mcan-ti": "canopen/mcan-ti.js",
+      "mcan-di": "canopen/mcan-di.js",
+      "mcan-do": "canopen/mcan-do.js",
+      "mcan-pwm": "canopen/mcan-pwm.js"
     }
   },
   "author": "MicroControl GmbH & Co. KG",
