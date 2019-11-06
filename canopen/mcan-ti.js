@@ -39,9 +39,8 @@ module.exports = function(RED) {
 	       const node = this;  
 		   node.on('close', node.close);
 
-		   	//this is neccassary to store objects within node to access it in other functions
-			const context = node.context();
-
+	       //this is neccassary to store objects within node to access it in other functions
+		   const context = node.context();
 
            var canBus        = config.canBus;
            var nodeId        = config.nodeId;

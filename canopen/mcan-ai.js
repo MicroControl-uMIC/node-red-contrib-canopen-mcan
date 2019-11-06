@@ -18,10 +18,6 @@ const moduledeviceType     = 131476;
 const moduleProductCode    = 1244001;
 const moduleRevisionNumber = 50463754;
 
-var ai_socket;
-
-var node;
-
 //-----------------------------------------------------------------------------------------------------
 // define variables here
 //-----------------------------------------------------------------------------------------------------
@@ -37,8 +33,11 @@ module.exports = function(RED) {
 	        //---------------------------------------------------------------------------------------------
 	        // runs when flow is deployed
 	        //---------------------------------------------------------------------------------------------
-	        node = this;  
+	        const node = this;  
 	        node.on('close', this.close);
+	        
+		    //this is neccassary to store objects within node to access it in other functions
+			const context = node.context();
 	        
 	        node.nodeId 		= config.nodeId;
 	        node.productCode 	= config.productCode;
@@ -57,7 +56,7 @@ module.exports = function(RED) {
 			idString = idString + "sensor-type: "    + node.sensorType	   + ";";
 			  
 	        //open socket
-	        ai_socket = new WsComet(node.canBus, node.nodeId, node.moduleChannel);       
+	        const ai_socket = new WsComet(node.canBus, node.nodeId, node.moduleChannel);       
 	        
 			var client = ai_socket.connect_ws();
 	        
