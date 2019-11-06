@@ -4,46 +4,46 @@
 //------------------------------------------------------------------------------------------------------
 'use strict';
 
-var bufferView;
+
 
 class NodeData
 {
 	constructor()
 	{
-
+		var bufferView;
 	}
 	
-	setBuffer(buffer, size)
+	setBuffer(length, size)
 	{
-		this.buffer = buffer;
+		this.length = length;
 		this.size = size;
 		
 		if(this.size === 8)
 		{
-			bufferView = new Int8Array(this.buffer);
+			this.bufferView = new Int8Array(this.length);
 		}
 		if(this.size === 16)
 		{
-			bufferView = new Int16Array(this.buffer);
+			this.bufferView = new Int16Array(this.length);
 		}
 		if(this.size === 32)
 		{
-			bufferView = new Int32Array(this.buffer);
+			this.bufferView = new Int32Array(this.length);
 		}
 	}
 	
 	getBuffer()
 	{
-		return bufferView;
+		return this.bufferView;
 	}
 	
 	getValue(index)
 	{
 		this.index = index;
 		
-		if(this.index < bufferView.length)
+		if(this.index < this.bufferView.length)
 		{
-			return bufferView[this.index];
+			return this.bufferView[this.index];
 		}
 		else
 		{
@@ -56,27 +56,12 @@ class NodeData
 		this.index = index;
 		this.value = value;
 		
-		if(this.size === 8)
+
+		if(this.index < this.bufferView.length)
 		{
-			if(this.index < bufferView.length)
-			{
-				bufferView.setInt8(this.index, this.value); 
-			}
-		}
-		if(this.size === 16)
-		{
-			if(this.index < bufferView.length)
-			{
-				bufferView.setInt16(this.index, this.value); 
-			}
-		}
-		if(this.size === 32)
-		{
-			if(this.index < bufferView.length)
-			{
-				bufferView.setInt32(this.index, this.value); 
-			}
+			this.bufferView[this.index] = this.value; 
 		}
 	}
+
 }
 module.exports = NodeData;

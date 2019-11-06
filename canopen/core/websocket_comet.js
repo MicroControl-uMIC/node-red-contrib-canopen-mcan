@@ -84,6 +84,11 @@ class WsComet{
         return client;
 	}
 
+	get_client()
+	{
+		return client;
+	}
+
     disconnect_ws()
     {
 		var socketUrl = wsUrl + this.canCh + "/" + this.nodeId + "/" + this.modCh;

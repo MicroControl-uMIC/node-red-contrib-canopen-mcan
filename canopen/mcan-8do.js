@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */ 
-
+'use strict';
 //-----------------------------------------------------------------------------------------------------//
 // for detailed information: https://nodered.org/docs/creating-nodes/node-js                           //
 //-----------------------------------------------------------------------------------------------------//
@@ -18,9 +18,7 @@ const moduledeviceType     = 197009;
 const moduleProductCode    = 1286014;
 const moduleRevisionNumber = 2;
 
-var do_socket;
 
-var node;
 
 //-----------------------------------------------------------------------------------------------------
 // define variables here
@@ -37,31 +35,37 @@ module.exports = function(RED) {
 	        //---------------------------------------------------------------------------------------------
 	        // runs when flow is deployed
 	        //---------------------------------------------------------------------------------------------
-	        node = this;  
+	        const node = this;  
 	        node.on('close', node.close);
-	        node.on('input', node.input);
-	        
-	        node.nodeId 		= config.nodeId;
-	        node.productCode 	= config.productCode;
-	        node.canBus 		= config.canBus;
-	        node.moduleChannel 	= config.moduleChannel;
+			node.on('input', node.input);
+
+			//this is neccassary to store objects within node to access it in other functions
+			const context = node.context();
+
+	        const nodeId 		= config.nodeId;
+	        const canBus 		= config.canBus;
+	        const moduleChannel 	= config.moduleChannel;
 	
 	        //create Buffer for rcv Data
-	        var do_data = new NodeData();
+			var doData = new NodeData();
 	        
 	        //creat id String
-	        var identification = new DeviceIdString(node.canBus, node.nodeId, node.moduleChannel, 
+	        var identification = new DeviceIdString(canBus, nodeId, moduleChannel, 
 					14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
-	      //add specific string
+					
+	        //add specific string
 	        var idString = identification.getIdString();
 	        idString = idString + "port-direction: 1"+ ";" + 
 			"error-mode: 0"+ ";" +
 			"error-value: 0"+ ";";
 			
 	        //open socket
-	        do_socket = new WsComet(node.canBus, node.nodeId, node.moduleChannel);       
+	        const doSocket = new WsComet(canBus, nodeId, moduleChannel);       
 	        
-			var client = do_socket.connect_ws();
+			const client = doSocket.connect_ws();
+
+			//store the client in the context of node
+			context.set('client', client);
 	        
 			client.onopen = function()
 			{
@@ -73,48 +77,46 @@ module.exports = function(RED) {
 	    	client.onclose = function() 
 	    	{
 	    	    console.log('echo-protocol Client Closed');
-	    	    node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Not connected"});
+	    	    node.status({fill:"red",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Not connected"});
 	    	};
 	    	
 	        //gets executed when socket receives a message	
 	    	client.onmessage = function (event) 
 	    	{
-	    			//console.log("msg received");
-	
-	    			do_data.setBuffer(event.data, 32);
+				doData.setBuffer(event.data, 32);
 	       
 	                //check Status Variable
-	                if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
+	                if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
 	            	{
-	                	node.status({fill:"green",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] OK"});	                	
+	                	node.status({fill:"green",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] OK"});	                	
 	            	}
-	                else if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
+	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
 	            	{
-	                	node.status({fill:"yellow",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Error"});                	
+	                	node.status({fill:"yellow",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Error"});                	
 	            	}	                
-	                else if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_COMMUNICATION)
+	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_COMMUNICATION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Error"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Error"});
 	            	}
-	                else if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION)
+	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Not connected"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Not connected"});
 	            	}
-	                else if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK)
+	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Wrong Network"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Wrong Network"});
 	            	}
-	                else if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_DEVICE)
+	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_DEVICE)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Wrong Node-ID"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Wrong Node-ID"});
 	            	}
-	                else if(do_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_CHANNEL)
+	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_CHANNEL)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Wrong Channel"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Wrong Channel"});
 	            	}
-	                else if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION)
+	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Wrong device identification"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Wrong device identification"});
 	            	}
 	                
 	    		};
@@ -122,7 +124,27 @@ module.exports = function(RED) {
 		
         input(msg) 
         {
-        	client.send(msg.payload);
+			var inpData = new NodeData();
+			//neccassary to access context storage
+			var context = this.context();
+
+			var rcvData = msg.payload;
+			//read context variable
+			const client = context.get('client');
+
+			inpData.setBuffer(4,32);
+
+			if(rcvData === true)
+			{
+				inpData.addValue(0,1);
+			}
+			else
+			{
+				inpData.addValue(0,0);
+			}
+			inpData.addValue(1,0);
+
+        	client.send(inpData.getBuffer());
         }
 		
         //---------------------------------------------------------------------------------------------
@@ -130,8 +152,10 @@ module.exports = function(RED) {
         //---------------------------------------------------------------------------------------------
         close()
         {
-        	do_socket.disconnect_ws();
-        	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Not connected"});
+			var socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);  
+			socket.disconnect_ws();
+			
+        //	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Not connected"});
         }
 
     }
