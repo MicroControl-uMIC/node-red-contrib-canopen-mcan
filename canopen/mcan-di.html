@@ -15,9 +15,10 @@
         oneditprepare: function() {
             $('.editor-tray-content').css({"width" : 400 +  "px"});
         },
-        outputs:1,
-        outputLabels: ["Output"],
-        icon: "mcan_dio.png",
+        inputs:  0,
+        outputs: 1,
+        outputLabels: ["Boolean"],
+        icon: "mcan-dio-in.png",
         label: function() {
 	    return this.name || "µCAN.8.dio in";}
     });
