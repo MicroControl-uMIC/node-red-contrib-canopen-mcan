@@ -39,6 +39,9 @@ module.exports = function(RED) {
 	       const node = this;  
 		   node.on('close', node.close);
 
+		   	//this is neccassary to store objects within node to access it in other functions
+			const context = node.context();
+
 
            var canBus        = config.canBus;
            var nodeId        = config.nodeId;
@@ -47,7 +50,7 @@ module.exports = function(RED) {
 		   var sensorType    = config.sensorType;
 
 	        //create Buffer for rcv Data
-	        const ti_data = new NodeData();
+	        const tiData = new NodeData();
 
 	        //creat id String
 			  var identification = new DeviceIdString(canBus, nodeId, moduleChannel, 
@@ -57,10 +60,13 @@ module.exports = function(RED) {
 			  idString = idString + "sensor-type: "    + sensorType + ";";
 			
 	        //open socket
-	        const ti_socket = new WsComet(canBus, nodeId, moduleChannel);       
+	        const tiSocket = new WsComet(canBus, nodeId, moduleChannel);       
 	        
-			const client = ti_socket.connect_ws();
-	        
+			const client = tiSocket.connect_ws();
+
+	        //store the client in the context of node
+			context.set('client', client);
+
 			client.onopen = function()
 			{
 				//send identification string upon socket connection
@@ -77,48 +83,44 @@ module.exports = function(RED) {
 	        //gets executed when socket receives a message	
 	    	client.onmessage = function (event) 
 	    	{
-				console.log("RCV DATA on CH: " + moduleChannel + " and ws: " + client.url);
-				
-					ti_data.setBuffer(event.data, 32);
+				tiData.setBuffer(event.data, 32);
 
 	                //check Status Variable
-	                if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
+	                if(tiData.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
 	            	{
 	                	node.status({fill:"green",shape:"dot",text: "[In "+moduleChannel+"] OK"});
-	                	console.log("RCV DATA VALUE: " + ti_data.getValue(0));
-	                	var scaledData = ti_data.getValue(0) / 10;
-	                	var msgData = {payload: scaledData ,
+	                	let scaledData = tiData.getValue(0) / 10;
+	                	const msgData = {payload: scaledData ,
 										topic: "mcan4ti/" + moduleChannel};
 
-						node.send(msgData);
 
-	                	
+						node.send(msgData);	                	
 	            	}
-	                else if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
+	                else if(tiData.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
 	            	{
 	                	node.status({fill:"yellow",shape:"dot",text: "[In "+moduleChannel+"] Error"});                	
 	            	}	                
-	                else if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_COMMUNICATION)
+	                else if(tiData.getValue(1) === NodeErrorEnum.eNODE_ERR_COMMUNICATION)
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Error"});
 	            	}
-	                else if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION)
+	                else if(tiData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION)
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Not connected"});
 	            	}
-	                else if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK)
+	                else if(tiData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK)
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong Network"});
 	            	}
-	                else if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_DEVICE)
+	                else if(tiData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_DEVICE)
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong Node-ID"});
 	            	}
-	                else if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_CHANNEL)
+	                else if(tiData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_CHANNEL)
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong Channel"});
 	            	}
-	                else if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION)
+	                else if(tiData.getValue(1) === NodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION)
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong device identification"});
 	            	}
@@ -131,11 +133,13 @@ module.exports = function(RED) {
         //---------------------------------------------------------------------------------------------
         close()
         {
-			//var node = RED.nodes.this;
-			var socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);  
+			//neccassary to access context storage
+			var context = this.context();
 
-			socket.disconnect_ws();
-        //	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Not connected"});
+			//read context variable
+			const client = context.get('client');
+
+			client.close();
 		}
 
     }

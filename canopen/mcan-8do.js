@@ -66,6 +66,7 @@ module.exports = function(RED) {
 
 			//store the client in the context of node
 			context.set('client', client);
+			context.set('node', node);
 	        
 			client.onopen = function()
 			{
@@ -88,35 +89,35 @@ module.exports = function(RED) {
 	                //check Status Variable
 	                if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
 	            	{
-	                	node.status({fill:"green",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] OK"});	                	
+	                	node.status({fill:"green",shape:"dot",text: "[In "+moduleChannel+"] OK"});	                	
 	            	}
 	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
 	            	{
-	                	node.status({fill:"yellow",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Error"});                	
+	                	node.status({fill:"yellow",shape:"dot",text: "[In "+moduleChannel+"] Error"});                	
 	            	}	                
 	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_COMMUNICATION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Error"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Error"});
 	            	}
 	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Not connected"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Not connected"});
 	            	}
 	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Wrong Network"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong Network"});
 	            	}
 	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_DEVICE)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Wrong Node-ID"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong Node-ID"});
 	            	}
 	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_CHANNEL)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Wrong Channel"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong Channel"});
 	            	}
 	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+doSocket.getChannelUrl()+"] Wrong device identification"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong device identification"});
 	            	}
 	                
 	    		};
@@ -152,10 +153,16 @@ module.exports = function(RED) {
         //---------------------------------------------------------------------------------------------
         close()
         {
-			var socket = new WsComet(this.canBus, this.nodeId, this.moduleChannel);  
-			socket.disconnect_ws();
-			
-        //	node.status({fill:"red",shape:"dot",text: "[In "+do_socket.getChannelUrl()+"] Not connected"});
+			//neccassary to access context storage
+			var context = this.context();
+
+			//read context variable
+			const client = context.get('client');
+			const node = context.get('node');
+
+			client.close();
+			node.status({fill:"red",shape:"dot",text: "[In "+this.moduleChannel+"] Not connected"});
+
         }
 
     }
