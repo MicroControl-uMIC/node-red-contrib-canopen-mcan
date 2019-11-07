@@ -36,31 +36,27 @@ module.exports = function(RED) {
 	       //---------------------------------------------------------------------------------------------
 	       // runs when flow is deployed
 	       //---------------------------------------------------------------------------------------------
-	       const node = this;  
+		   const node = this;
+           const canBus        = config.canBus;
+           const nodeId        = config.nodeId;
+		   const moduleChannel = config.moduleChannel;
+		   const sensorType    = config.sensorType;		     
 		   node.on('close', node.close);
-
-	       //this is neccassary to store objects within node to access it in other functions
+		   //this is neccassary to store objects within node to access it in other functions
 		   const context = node.context();
+		   context.set('node', node);
+		   //open socket
+		   const tiSocket = new WsComet(canBus, nodeId, moduleChannel);
+		   //create Buffer for rcv Data
+		   const tiData = new NodeData();
+		   //creat id String
+		   var identification = new DeviceIdString(canBus, nodeId, moduleChannel, 
+			14, moduleProductCode , moduleRevisionNumber, moduledeviceType); 
 
-           var canBus        = config.canBus;
-           var nodeId        = config.nodeId;
-		   var moduleChannel = config.moduleChannel;
-		   
-		   var sensorType    = config.sensorType;
-
-	        //create Buffer for rcv Data
-	        const tiData = new NodeData();
-
-	        //creat id String
-			  var identification = new DeviceIdString(canBus, nodeId, moduleChannel, 
-																	14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
 	        //add specific string
-			  var idString = identification.getIdString();
-			  idString = idString + "sensor-type: "    + sensorType + ";";
-			
-	        //open socket
-	        const tiSocket = new WsComet(canBus, nodeId, moduleChannel);       
-	        
+			var idString = identification.getIdString();
+			idString = idString + "sensor-type: "    + sensorType + ";";			
+      	        
 			const client = tiSocket.connect_ws();
 
 	        //store the client in the context of node
@@ -137,8 +133,10 @@ module.exports = function(RED) {
 
 			//read context variable
 			const client = context.get('client');
+			const node = context.get('node');
 
 			client.close();
+			node.status({fill:"red",shape:"dot",text: "[In "+this.moduleChannel+"] Not connected"});
 		}
 
     }

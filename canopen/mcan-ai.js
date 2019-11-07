@@ -39,27 +39,30 @@ module.exports = function(RED) {
 		    //this is neccassary to store objects within node to access it in other functions
 			const context = node.context();
 	        
-	        node.nodeId 		= config.nodeId;
-	        node.productCode 	= config.productCode;
-	        node.sensorType 	= config.sensorType;
-	        node.canBus 		= config.canBus;
-	        node.moduleChannel 	= config.moduleChannel;
+	        const nodeId 		= config.nodeId;
+	        const sensorType 	= config.sensorType;
+	        const canBus 		= config.canBus;
+	        const moduleChannel = config.moduleChannel;
 	
 	        //create Buffer for rcv Data
-	        var ai_data = new NodeData();
+	        var aiData = new NodeData();
+			  
+	        //open socket	               	        
+	        const aiSocket = new WsComet(canBus, nodeId, moduleChannel);
 	        
 	        //creat id String
-			var identification = new DeviceIdString(node.canBus, node.nodeId, node.moduleChannel, 
+			const identification = new DeviceIdString(canBus,nodeId, moduleChannel, 
 																	14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
 	        //add specific string
 			var idString = identification.getIdString();
-			idString = idString + "sensor-type: "    + node.sensorType	   + ";";
-			  
-	        //open socket
-	        const ai_socket = new WsComet(node.canBus, node.nodeId, node.moduleChannel);       
-	        
-			var client = ai_socket.connect_ws();
-	        
+			idString = idString + "sensor-type: "    + sensorType + ";";
+
+			var client = aiSocket.connect_ws();
+
+	        //store the client in the context of node
+			context.set('client', client);
+			context.set('node', node);
+
 			client.onopen = function()
 			{
 				//send identification string upon socket connection
@@ -70,53 +73,53 @@ module.exports = function(RED) {
 	    	client.onclose = function() 
 	    	{
 	    	    console.log('echo-protocol Client Closed');
-	    	    node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Not connected"});
+	    	    node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Not connected"});
 	    	};
 	    	
 	        //gets executed when socket receives a message	
 	    	client.onmessage = function (event) 
 	    	{
-	    			ai_data.setBuffer(event.data, 32);
+				aiData.setBuffer(event.data, 32);
 	       
 	                //check Status Variable
-	                if(ai_data.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
+	                if(aiData.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
 	            	{
-	                	node.status({fill:"green",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] OK"});
+	                	node.status({fill:"green",shape:"dot",text: "[In "+moduleChannel+"] OK"});
 	                	
-	                	var scaledData = ai_data.getValue(0) / 10;
+	                	var scaledData = aiData.getValue(0) / 10;
 	                	var msgData = {payload: scaledData ,
-	                				   topic: "mcan4ai/" + node.moduleChannel};
+	                				   topic: "mcan4ai/" + moduleChannel};
 	
 	                	node.send(msgData);
 	                	
 	            	}
-	                else if(ai_data.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
+	                else if(aiData.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
 	            	{
-	                	node.status({fill:"yellow",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Error"});                	
+	                	node.status({fill:"yellow",shape:"dot",text: "[In "+moduleChannel+"] Error"});                	
 	            	}	                
-	                else if(ai_data.getValue(1) === NodeErrorEnum.eNODE_ERR_COMMUNICATION)
+	                else if(aiData.getValue(1) === NodeErrorEnum.eNODE_ERR_COMMUNICATION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Error"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Error"});
 	            	}
-	                else if(ai_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION)
+	                else if(aiData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Not connected"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Not connected"});
 	            	}
-	                else if(ai_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK)
+	                else if(aiData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Wrong Network"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong Network"});
 	            	}
-	                else if(ai_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_DEVICE)
+	                else if(aiData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_DEVICE)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Wrong Node-ID"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong Node-ID"});
 	            	}
-	                else if(ai_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_CHANNEL)
+	                else if(aiData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_CHANNEL)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Wrong Channel"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong Channel"});
 	            	}
-	                else if(ai_data.getValue(1) === NodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION)
+	                else if(aiData.getValue(1) === NodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Wrong device identification"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong device identification"});
 	            	}
 	                
 	    		};
@@ -129,8 +132,15 @@ module.exports = function(RED) {
         //---------------------------------------------------------------------------------------------
         close()
         {
-        	ai_socket.disconnect_ws();
-        	node.status({fill:"red",shape:"dot",text: "[In "+ai_socket.getChannelUrl()+"] Not connected"});
+			//neccassary to access context storage
+			var context = this.context();
+
+			//read context variable
+			const client = context.get('client');
+			const node = context.get('node');
+
+			client.close();
+			node.status({fill:"red",shape:"dot",text: "[In "+this.moduleChannel+"] Not connected"});
         }
 
     }

@@ -44,18 +44,19 @@ module.exports = function(RED) {
 	        node = this;  
 	        node.on('close', node.close);
 	        node.on('input', node.input);
+		    //this is neccassary to store objects within node to access it in other functions
+			const context = node.context();
 	        
-	        node.nodeId 		= config.nodeId;
-	        node.productCode 	= config.productCode;
-	        node.canBus 		= config.canBus;
-	        node.moduleChannel  = config.moduleChannel;
-	        node.moduleFreq 	= config.moduleFreq;
+	        const nodeId 		= config.nodeId;
+	        const canBus 		= config.canBus;
+	        const moduleChannel  = config.moduleChannel;
+	        const moduleFreq 	= config.moduleFreq;
 	
 	        //create Buffer for rcv Data
 	        var pwm_data = new NodeData();
 	        
 	        //creat id String
-	        var identification = new DeviceIdString(node.canBus, node.nodeId, node.moduleChannel, 
+	        var identification = new DeviceIdString(canBus, nodeId, moduleChannel, 
 					14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
 	        
 	        //add specific string
@@ -63,9 +64,13 @@ module.exports = function(RED) {
 	        idString = idString + "base-frequency: "    + config.moduleFreq	   + ";";
 	        
 	        //open socket
-	        pwm_socket = new WsComet(node.canBus, node.nodeId, node.moduleChannel);       
+	        pwm_socket = new WsComet(canBus, nodeId, moduleChannel);       
 	        
 			var client = pwm_socket.connect_ws();
+			
+	        //store the client in the context of node
+			context.set('client', client);
+			context.set('node', node);
 	        
 			client.onopen = function()
 			{
@@ -77,7 +82,7 @@ module.exports = function(RED) {
 	    	client.onclose = function() 
 	    	{
 	    	    console.log('echo-protocol Client Closed');
-	    	    node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Not connected"});
+	    	    node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Not connected"});
 	    	};
 	    	
 	        //gets executed when socket receives a message	
@@ -90,36 +95,36 @@ module.exports = function(RED) {
 	                //check Status Variable
 	                if(pwm_data.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
 	            	{
-	                	node.status({fill:"green",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] OK"});
+	                	node.status({fill:"green",shape:"dot",text: "[In "+moduleChannel+"] OK"});
 
 	            	}
 	                else if(pwm_data.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
 	            	{
-	                	node.status({fill:"yellow",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Error"});                	
+	                	node.status({fill:"yellow",shape:"dot",text: "[In "+moduleChannel+"] Error"});                	
 	            	}	                
 	                else if(pwm_data.getValue(1) === NodeErrorEnum.eNODE_ERR_COMMUNICATION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Error"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Error"});
 	            	}
 	                else if(pwm_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Not connected"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Not connected"});
 	            	}
 	                else if(pwm_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Wrong Network"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong Network"});
 	            	}
 	                else if(pwm_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_DEVICE)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Wrong Node-ID"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong Node-ID"});
 	            	}
 	                else if(pwm_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_CHANNEL)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Wrong Channel"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong Channel"});
 	            	}
-	                else if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION)
+	                else if(pwm_data.getValue(1) === NodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION)
 	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Wrong device identification"});
+	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong device identification"});
 	            	}
 	                
 	    		};
@@ -127,7 +132,21 @@ module.exports = function(RED) {
 		
         input(msg) 
         {
-        	client.send(msg.payload);
+			var inpData = new NodeData();
+			//neccassary to access context storage
+			var context = this.context();
+
+			var rcvData = msg.payload;
+			//read context variable
+			const client = context.get('client');
+
+			inpData.setBuffer(4,32);
+
+			inpData.addValue(0,rcvData);
+
+			inpData.addValue(1,0);
+
+        	client.send(inpData.getBuffer());
         }
 		
         //---------------------------------------------------------------------------------------------
@@ -135,8 +154,15 @@ module.exports = function(RED) {
         //---------------------------------------------------------------------------------------------
         close()
         {
-        	pwm_socket.disconnect_ws();
-        	node.status({fill:"red",shape:"dot",text: "[In "+pwm_socket.getChannelUrl()+"] Not connected"});
+			//neccassary to access context storage
+			var context = this.context();
+
+			//read context variable
+			const client = context.get('client');
+			const node = context.get('node');
+
+			client.close();
+			node.status({fill:"red",shape:"dot",text: "[In "+this.moduleChannel+"] Not connected"});
         }
 
     }
