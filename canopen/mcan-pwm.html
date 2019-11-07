@@ -16,9 +16,11 @@
         oneditprepare: function() {
             $('.editor-tray-content').css({"width" : 400 +  "px"});
         },
-        inputs:1,
-        outputLabels: ["Output"],
-        icon: "mcan_dio.png",
+
+        inputs:  1,
+        inputLabels: ["Number"],
+        outputs: 0,
+        icon: "mcan-pwm.png",
         label: function() {
 	    return this.name || "µCAN.8.pwm";}
     });
@@ -32,10 +34,10 @@
 
     <div class="form-row">
         <label for="node-input-deviceName"> <span data-i18n="mcan-pwm.labelName"></span> </label>
-        <input type="text" id="node-input-deviceName" style="width:200px; display:inline-block"> 
+        <input type="text" id="node-input-deviceName" style="width:200px; display:inline-block">
     </div>
 
-    
+
     <div class="form-row">
         <label for="node-input-canBus"><span data-i18n="mcan-pwm.labelCanCh"></span> </label>
         <select type="text" id="node-input-canBus" style="width:200px; display:inline-block">
@@ -46,7 +48,7 @@
 
     <div class="form-row">
         <label for="node-input-nodeId"><span data-i18n="mcan-pwm.labelNodeId"></span> </label>
-        <input type="number" id="node-input-nodeId" style="width:200px; display:inline-block" max="126" min="1"> 
+        <input type="number" id="node-input-nodeId" style="width:200px; display:inline-block" max="126" min="1">
     </div>
 
 	 <div class="mcan-labelInpSel">
@@ -66,10 +68,10 @@
             <option value="8", data-i18n="mcan-pwm.optionCh8"></option>
        </select>
     </div>
-    
+
         <div class="form-row">
         <label for="node-input-moduleFreq"><span data-i18n="mcan-pwm.labelModFreq"></span> </label>
-        <input type="number" id="node-input-moduleFreq" style="width:200px; display:inline-block" max="500" min="25"> 
+        <input type="number" id="node-input-moduleFreq" style="width:200px; display:inline-block" max="500" min="25">
         <label for="node-input-moduleFreq"> Hz</label>
     </div>
 
