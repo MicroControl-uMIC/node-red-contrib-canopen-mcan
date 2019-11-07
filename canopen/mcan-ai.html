@@ -15,8 +15,10 @@
         oneditprepare: function() {
             $('.editor-tray-content').css({"width" : 400 +  "px"});
         },
-        outputs:1,
+        inputs:  0,
+        outputs: 1,
         outputLabels: ["Number"],
+        icon: "mcan-ai-in.png",
         label: function() {
 	    return this.name || "µCAN.4.ai";}
     });
@@ -30,10 +32,10 @@
 
     <div class="form-row">
         <label for="node-input-deviceName"> <span data-i18n="mcan-ai.labelName"></span> </label>
-        <input type="text" id="node-input-deviceName" style="width:200px; display:inline-block"> 
+        <input type="text" id="node-input-deviceName" style="width:200px; display:inline-block">
     </div>
 
-    
+
     <div class="form-row">
         <label for="node-input-canBus"><span data-i18n="mcan-ai.labelCanCh"></span> </label>
         <select type="text" id="node-input-canBus" style="width:200px; display:inline-block">
@@ -44,7 +46,7 @@
 
     <div class="form-row">
         <label for="node-input-nodeId"><span data-i18n="mcan-ai.labelNodeId"></span> </label>
-        <input type="number" id="node-input-nodeId" style="width:200px; display:inline-block" max="126" min="1"> 
+        <input type="number" id="node-input-nodeId" style="width:200px; display:inline-block" max="126" min="1">
     </div>
 
 	 <div class="mcan-labelInpSel">
@@ -67,10 +69,10 @@
             <option value="0", data-i18n="mcan-ai.noOption></option>
             <option value="42">0..10V</option>
             <option value="51">0..20mA</option>
-       </select>   
+       </select>
     </div>
 	 </div>
-	 
+
     <script>
             $("#node-input-moduleChannel").change(function() {
                 var checkCh = $("#node-input-moduleChannel").val();
@@ -82,12 +84,12 @@
                  $(".node-input-sensorType").show();
              } else if (checkCh === "4") {
                  $(".node-input-sensorType").show();
-             } 
+             }
               else {
                  $(".node-input-sensorType").hide();
                  document.getElementById("node-input-moduleChannel").selectedIndex = "0";
              }
-            }); 
+            });
     </script>
 
 </script>
