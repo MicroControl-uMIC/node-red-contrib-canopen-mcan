@@ -15,9 +15,10 @@
         oneditprepare: function() {
             $('.editor-tray-content').css({"width" : 400 +  "px"});
         },
-        inputs:1,
-        inputLabels: ["Input"],
-        icon: "font-awesome/sign-in",
+        inputs:  1,
+        inputLabels: ["Boolean"],
+        outputs: 0,
+        icon: "mcan-dio-out.png",
         label: function() {
 	    return this.name || "µCAN.8.dio out";}
     });
@@ -31,10 +32,10 @@
 
     <div class="form-row">
         <label for="node-input-deviceName"> <span data-i18n="mcan-do.labelName"></span> </label>
-        <input type="text" id="node-input-deviceName" style="width:200px; display:inline-block"> 
+        <input type="text" id="node-input-deviceName" style="width:200px; display:inline-block">
     </div>
 
-    
+
     <div class="form-row">
         <label for="node-input-canBus"><span data-i18n="mcan-do.labelCanCh"></span> </label>
         <select type="text" id="node-input-canBus" style="width:200px; display:inline-block">
@@ -45,7 +46,7 @@
 
     <div class="form-row">
         <label for="node-input-nodeId"><span data-i18n="mcan-do.labelNodeId"></span> </label>
-        <input type="number" id="node-input-nodeId" style="width:200px; display:inline-block" max="126" min="1"> 
+        <input type="number" id="node-input-nodeId" style="width:200px; display:inline-block" max="126" min="1">
     </div>
 
 	 <div class="mcan-labelInpSel">
