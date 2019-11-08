@@ -1,4 +1,6 @@
-/*jshint esversion: 6 */ 
+/*jshint esversion: 6 */
+
+"use strict";
 
 //-----------------------------------------------------------------------------------------------------//
 // for detailed information: https://nodered.org/docs/creating-nodes/node-js                           //
@@ -9,138 +11,215 @@
 //-----------------------------------------------------------------------------------------------------
 
 
-const DeviceIdString  = require("./core/id_string");
-const WsComet = require("./core/websocket_comet.js");
-const NodeData  = require("./core/node_data.js");
-const NodeErrorEnum	  = require("./core/node_error.js");
+const deviceIdString  = require("./core/id_string");
+const socketComet     = require("./core/websocket_comet.js");
+const nodeData        = require("./core/node_data.js");
+const nodeErrorEnum	  = require("./core/node_error.js");
+
 
 const moduledeviceType     = 197009;
 const moduleProductCode    = 1286014;
 const moduleRevisionNumber = 2;
 
-var di_socket;
-
-var diStateOld = false;
-
-var node;
 
 //-----------------------------------------------------------------------------------------------------
 // define variables here
 //-----------------------------------------------------------------------------------------------------
 
 module.exports = function(RED) {
-	
-    class MCANDi
-    {
-		constructor(config) 
-	    {
-	        RED.nodes.createNode(this,config);
-	       
-	        //---------------------------------------------------------------------------------------------
-	        // runs when flow is deployed
-	        //---------------------------------------------------------------------------------------------
-	        node = this;  
-	        node.on('close', node.close);
-	        
-	        node.nodeId 		= config.nodeId;
-	        node.productCode 	= config.productCode;
-	        node.canBus 		= config.canBus;
-	        node.moduleChannel  = config.moduleChannel;
-	
-	        //create Buffer for rcv Data
-	        var di_data = new NodeData();
-	        
-	        //creat id String
-	        var identification = new DeviceIdString(node.canBus, node.nodeId, node.moduleChannel, 
-					14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
-	        
-	         //add specific string
-	        var idString = identification.getIdString();
-	        idString = idString + "port-direction: 0"+ ";"; 
-	        
-	        //open socket
-	        di_socket = new WsComet(node.canBus, node.nodeId, node.moduleChannel);       
-	        
-			var client = di_socket.connect_ws();
-	        
-			client.onopen = function()
-			{
-				//send identification string upon socket connection
-	    	    console.log(idString);
-				client.send(idString);
-			};
-			
-	    	client.onclose = function() 
-	    	{
-	    	    console.log('echo-protocol Client Closed');
-	    	    node.status({fill:"red",shape:"dot",text: "[In "+di_socket.getChannelUrl()+"] Not connected"});
-	    	};
-	    	
-	        //gets executed when socket receives a message	
-	    	client.onmessage = function (event) 
-	    	{
-	    			//console.log("msg received");
-	
-	    			di_data.setBuffer(event.data, 32);
-	       
-	                //check Status Variable
-	                if(di_data.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
-	            	{
-	                	node.status({fill:"green",shape:"dot",text: "[In "+di_socket.getChannelUrl()+"] OK"});
-	                	
-	                	var diState = di_data.getValue(0);
 
-	                	if(diState != diStateOld)
-	                	{
-		                	var msgData = {payload: diState ,
-	                				       topic: "mcan8dio/" + node.moduleChannel};
-	                		diStateOld = diState;
-		                	node.send(msgData);
-	                	}
-	                	
-	            	}
-	                else if(di_data.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
-	            	{
-	                	node.status({fill:"yellow",shape:"dot",text: "[In "+di_socket.getChannelUrl()+"] Error"});                	
-	            	}	                
-	                else if(di_data.getValue(1) === NodeErrorEnum.eNODE_ERR_COMMUNICATION)
-	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+di_socket.getChannelUrl()+"] Error"});
-	            	}
-	                else if(di_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION)
-	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+di_socket.getChannelUrl()+"] Not connected"});
-	            	}
-	                else if(di_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK)
-	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+di_socket.getChannelUrl()+"] Wrong Network"});
-	            	}
-	                else if(di_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_DEVICE)
-	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+di_socket.getChannelUrl()+"] Wrong Node-ID"});
-	            	}
-	                else if(di_data.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_CHANNEL)
-	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+di_socket.getChannelUrl()+"] Wrong Channel"});
-	            	}
-	                else if(ti_data.getValue(1) === NodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION)
-	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[In "+ti_socket.getChannelUrl()+"] Wrong device identification"});
-	            	}
-	                
-	    		};
-	    }
-		
-        //---------------------------------------------------------------------------------------------
-        // runs when node is closed (before deploy, e.g. to tidy up)
-        //---------------------------------------------------------------------------------------------
-        close()
+    //---------------------------------------------------------------------------------------------
+    // Definition of class 'McanDiNode'
+    //
+    class McanDiNode
+    {
+        //------------------------------------------------------------------------------------
+        // Constructor
+        // runs when flow is deployed
+        //
+        constructor(config)
         {
-        	di_socket.disconnect_ws();
-        	node.status({fill:"red",shape:"dot",text: "[In "+di_socket.getChannelUrl()+"] Not connected"});
+            RED.nodes.createNode(this,config);
+
+            const node = this;
+            node.on('close' , node.close);
+            //node.on('update', node.update);
+
+            //---------------------------------------------------------------------------
+            // this is neccassary to store objects within node to access it in other
+            // functions
+            //
+            const context = node.context();
+
+            const canBus        = config.canBus;
+            const nodeId        = config.nodeId;
+            const moduleChannel = config.moduleChannel;
+
+
+            //---------------------------------------------------------------------------
+            // set default input state
+            //
+            var inputState;
+
+            //---------------------------------------------------------------------------
+            // status of communication unknown
+            //
+            let statusValue   = nodeErrorEnum.eNODE_ERR_UNKOWN;
+
+            //---------------------------------------------------------------------------
+            // open socket
+            //
+            const socket = new socketComet(canBus, nodeId, moduleChannel);
+
+            //---------------------------------------------------------------------------
+            // create buffer for socket data
+            //
+            var inputData = new nodeData();
+
+            //---------------------------------------------------------------------------
+            // create id string
+            //
+            let identification = new deviceIdString(canBus, nodeId, moduleChannel,
+                                                    14,
+                                                    moduleProductCode ,
+                                                    moduleRevisionNumber,
+                                                    moduledeviceType);
+
+            //---------------------------------------------------------------------------
+            // add module specific string
+            //
+            let idString = identification.getIdString();
+            idString = idString + "port-direction: 0"+ ";";
+            console.log("ID:" + idString +" \n");
+
+            const client = socket.connect_ws();
+
+
+            //store the client in the context of node
+            context.set('client', client);
+            context.set('node'  , node);
+
+            //---------------------------------------------------------------------------
+            // send identification string upon socket connection
+            //
+            client.onopen = function()
+            {
+                console.log("onopen() .. : channel " + moduleChannel + "\n");
+                client.send(idString);
+            };
+
+            client.onclose = function()
+            {
+                console.log("onclose() .. : channel " + moduleChannel + "\n");
+                statusValue = nodeErrorEnum.eNODE_ERR_CONNECTION;
+                node.update(moduleChannel, statusValue);
+            };
+
+            //---------------------------------------------------------------------------
+            // gets executed when socket receives a message
+            //
+            client.onmessage = function (event)
+            {
+
+                inputData.setBuffer(event.data, 32);
+
+                //-------------------------------------------------------------------
+                // check communication status
+                //
+                if (statusValue != inputData.getValue(1))
+                {
+                    console.log("onmessage() .. : channel " + moduleChannel + "\n");
+                    statusValue = inputData.getValue(1);
+                    node.update(moduleChannel, statusValue);
+                }
+
+                if (statusValue === nodeErrorEnum.eNODE_ERR_NONE)
+                {
+                    let newInputState = true;
+                    if (inputData.getValue(0) === 0)
+                    {
+                        newInputState = false;
+                    }
+
+                    if (inputState != newInputState)
+                    {
+                        let msgData = { payload: newInputState ,
+                                        topic: "mcan-di/" + moduleChannel};
+                        inputState = newInputState;
+                        node.send(msgData);
+                    }
+                }
+            };
+
+            node.update = function (channel, status)
+            {
+                switch (status)
+                {
+                    case nodeErrorEnum.eNODE_ERR_NONE:
+                        node.status({fill:"green" , shape:"dot", text: "[In "+ channel +"] OK"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_SENSOR:
+                        node.status({fill:"yellow", shape:"dot", text: "[In "+ channel +"] Sensor Error"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_COMMUNICATION:
+                        node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Communication"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_CONNECTION:
+                        node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Not connected"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK:
+                        node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Network invalid"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_CONNECTION_DEVICE:
+                        node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Node-ID invalid"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_CONNECTION_CHANNEL:
+                        node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Channel invalid"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION:
+                        node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Identification failed"});
+                        break;
+
+                    default:
+                        node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Undefined"});
+                        break;
+                }
+
+            }
+
+
         }
 
+
+        //------------------------------------------------------------------------------------
+        // This method is called when the node is being stopped, e.g. a new flow
+        // configuration is deployed
+        //
+        close()
+        {
+            //neccassary to access context storage
+            var context = this.context();
+
+            //read context variable
+            const client = context.get('client');
+
+            client.close();
+
+        }
+
+        //------------------------------------------------------------------------------------
+        // This method is responsible for updating the node status
+        //
+
+
     }
-    
-    RED.nodes.registerType("mcan-dio in", MCANDi);
+
+    RED.nodes.registerType("mcan-dio in", McanDiNode);
 }
