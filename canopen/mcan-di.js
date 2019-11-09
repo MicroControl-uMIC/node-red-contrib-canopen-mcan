@@ -14,7 +14,7 @@
 const deviceIdString  = require("./core/id_string");
 const socketComet     = require("./core/websocket_comet.js");
 const nodeData        = require("./core/node_data.js");
-const nodeErrorEnum	  = require("./core/node_error.js");
+const nodeErrorEnum   = require("./core/node_error.js");
 
 
 const moduledeviceType     = 197009;
@@ -23,7 +23,7 @@ const moduleRevisionNumber = 2;
 
 
 //-----------------------------------------------------------------------------------------------------
-// define variables here
+// Definition of McanDiNode
 //-----------------------------------------------------------------------------------------------------
 
 module.exports = function(RED) {
@@ -43,7 +43,6 @@ module.exports = function(RED) {
 
             const node = this;
             node.on('close' , node.close);
-            //node.on('update', node.update);
 
             //---------------------------------------------------------------------------
             // this is neccassary to store objects within node to access it in other
@@ -81,7 +80,7 @@ module.exports = function(RED) {
             //
             let identification = new deviceIdString(canBus, nodeId, moduleChannel,
                                                     14,
-                                                    moduleProductCode ,
+                                                    moduleProductCode,
                                                     moduleRevisionNumber,
                                                     moduledeviceType);
 
@@ -90,12 +89,16 @@ module.exports = function(RED) {
             //
             let idString = identification.getIdString();
             idString = idString + "port-direction: 0"+ ";";
-            console.log("ID:" + idString +" \n");
 
+            //---------------------------------------------------------------------------
+            // setup client connection
+            //
             const client = socket.connect_ws();
 
 
-            //store the client in the context of node
+            //---------------------------------------------------------------------------
+            // keep the context
+            //
             context.set('client', client);
             context.set('node'  , node);
 
@@ -104,13 +107,14 @@ module.exports = function(RED) {
             //
             client.onopen = function()
             {
-                console.log("onopen() .. : channel " + moduleChannel + "\n");
                 client.send(idString);
             };
 
+            //---------------------------------------------------------------------------
+            // gets executed when the socket is closed
+            //
             client.onclose = function()
             {
-                console.log("onclose() .. : channel " + moduleChannel + "\n");
                 statusValue = nodeErrorEnum.eNODE_ERR_CONNECTION;
                 node.update(moduleChannel, statusValue);
             };
@@ -121,6 +125,9 @@ module.exports = function(RED) {
             client.onmessage = function (event)
             {
 
+                //-------------------------------------------------------------------
+                // convert input data
+                //
                 inputData.setBuffer(event.data, 32);
 
                 //-------------------------------------------------------------------
@@ -128,7 +135,6 @@ module.exports = function(RED) {
                 //
                 if (statusValue != inputData.getValue(1))
                 {
-                    console.log("onmessage() .. : channel " + moduleChannel + "\n");
                     statusValue = inputData.getValue(1);
                     node.update(moduleChannel, statusValue);
                 }
@@ -151,6 +157,10 @@ module.exports = function(RED) {
                 }
             };
 
+
+            //---------------------------------------------------------------------------
+            // This method is responsible for updating the node status
+            //
             node.update = function (channel, status)
             {
                 switch (status)
@@ -191,32 +201,33 @@ module.exports = function(RED) {
                         node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Undefined"});
                         break;
                 }
-
             }
-
-
         }
 
 
         //------------------------------------------------------------------------------------
-        // This method is called when the node is being stopped, e.g. a new flow
+        // This function is called when the node is being stopped, e.g. a new flow
         // configuration is deployed
         //
         close()
         {
-            //neccassary to access context storage
+            //---------------------------------------------------------------------------
+            // neccassary to access context storage
+            //
             var context = this.context();
 
-            //read context variable
+            //---------------------------------------------------------------------------
+            // read context variable
+            //
             const client = context.get('client');
 
+            //---------------------------------------------------------------------------
+            // close client connection
+            //
             client.close();
 
         }
 
-        //------------------------------------------------------------------------------------
-        // This method is responsible for updating the node status
-        //
 
 
     }

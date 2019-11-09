@@ -1,4 +1,4 @@
-/*jshint esversion: 6 */ 
+/*jshint esversion: 6 */
 'use strict';
 //-----------------------------------------------------------------------------------------------------//
 // for detailed information: https://nodered.org/docs/creating-nodes/node-js                           //
@@ -25,17 +25,17 @@ const moduleRevisionNumber = 2;
 //-----------------------------------------------------------------------------------------------------
 
 module.exports = function(RED) {
-	
+
     class MCANDo
     {
-		constructor(config) 
+		constructor(config)
 	    {
 	        RED.nodes.createNode(this,config);
-	       
+
 	        //---------------------------------------------------------------------------------------------
 	        // runs when flow is deployed
 	        //---------------------------------------------------------------------------------------------
-	        const node = this;  
+	        const node = this;
 	        node.on('close', node.close);
 			node.on('input', node.input);
 
@@ -45,56 +45,57 @@ module.exports = function(RED) {
 	        const nodeId 		= config.nodeId;
 	        const canBus 		= config.canBus;
 	        const moduleChannel 	= config.moduleChannel;
-	
+
 	        //create Buffer for rcv Data
 			var doData = new NodeData();
-	        
+
 	        //creat id String
-	        var identification = new DeviceIdString(canBus, nodeId, moduleChannel, 
+	        var identification = new DeviceIdString(canBus, nodeId, moduleChannel,
 					14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
-					
+
 	        //add specific string
 	        var idString = identification.getIdString();
-	        idString = idString + "port-direction: 1"+ ";" + 
+	        idString = idString + "port-direction: 1"+ ";" +
 			"error-mode: 0"+ ";" +
 			"error-value: 0"+ ";";
-			
+
 	        //open socket
-	        const doSocket = new WsComet(canBus, nodeId, moduleChannel);       
-	        
+	        const doSocket = new WsComet(canBus, nodeId, moduleChannel);
+
 			const client = doSocket.connect_ws();
 
 			//store the client in the context of node
 			context.set('client', client);
 			context.set('node', node);
-	        
+
 			client.onopen = function()
 			{
 				//send identification string upon socket connection
 	    	    console.log(idString);
 				client.send(idString);
 			};
-			
-	    	client.onclose = function() 
+
+	    	client.onclose = function()
 	    	{
 	    	    console.log('echo-protocol Client Closed');
-	    	    node.status({fill:"red",shape:"dot",text: "[Out "+doSocket.getChannelUrl()+"] Not connected"});
+                // fix this -> NO MORE getChannelUrl
+	    	    //node.status({fill:"red",shape:"dot",text: "[Out "+doSocket.getChannelUrl()+"] Not connected"});
 	    	};
-	    	
-	        //gets executed when socket receives a message	
-	    	client.onmessage = function (event) 
+
+	        //gets executed when socket receives a message
+	    	client.onmessage = function (event)
 	    	{
 				doData.setBuffer(event.data, 32);
-	       
+
 	                //check Status Variable
 	                if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
 	            	{
-	                	node.status({fill:"green",shape:"dot",text: "[Out "+moduleChannel+"] OK"});	                	
+	                	node.status({fill:"green",shape:"dot",text: "[Out "+moduleChannel+"] OK"});
 	            	}
 	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
 	            	{
-	                	node.status({fill:"yellow",shape:"dot",text: "[Out "+moduleChannel+"] Error"});                	
-	            	}	                
+	                	node.status({fill:"yellow",shape:"dot",text: "[Out "+moduleChannel+"] Error"});
+	            	}
 	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_COMMUNICATION)
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[Out "+moduleChannel+"] Error"});
@@ -119,11 +120,11 @@ module.exports = function(RED) {
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[Out "+moduleChannel+"] Wrong device identification"});
 	            	}
-	                
+
 	    		};
 	    }
-		
-        input(msg) 
+
+        input(msg)
         {
 			var inpData = new NodeData();
 			//neccassary to access context storage
@@ -147,7 +148,7 @@ module.exports = function(RED) {
 
         	client.send(inpData.getBuffer());
         }
-		
+
         //---------------------------------------------------------------------------------------------
         // runs when node is closed (before deploy, e.g. to tidy up)
         //---------------------------------------------------------------------------------------------
@@ -166,6 +167,6 @@ module.exports = function(RED) {
         }
 
     }
-    
+
     RED.nodes.registerType("mcan-dio out", MCANDo);
 }
