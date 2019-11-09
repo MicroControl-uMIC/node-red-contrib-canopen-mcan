@@ -5,6 +5,7 @@
         category: 'CANopen',
         color: '#FFCC66',
         defaults: {
+            name: {value:""},
             nodeId: {value: ""},
             productCode: {value: "12.86.014"},
             sensorType: {value: "input"},
@@ -31,11 +32,11 @@
     <img src="/node-red-contrib-canopen-mcan/icons/mcan-8dio.png" alt="µCAN.8.dio" style="width:257px;height:208px;align="middle">
 
     <div class="form-row">
-        <label for="node-input-deviceName"> <span data-i18n="mcan-di.labelName"></span> </label>
-        <input type="text" id="node-input-deviceName" style="width:200px; display:inline-block"> 
+        <label for="node-input-name"> <span data-i18n="mcan-di.labelName"></span> </label>
+        <input type="text" id="node-input-deviceName" style="width:200px; display:inline-block">
     </div>
 
-    
+
     <div class="form-row">
         <label for="node-input-canBus"><span data-i18n="mcan-di.labelCanCh"></span> </label>
         <select type="text" id="node-input-canBus" style="width:200px; display:inline-block">
@@ -46,7 +47,7 @@
 
     <div class="form-row">
         <label for="node-input-nodeId"><span data-i18n="mcan-di.labelNodeId"></span> </label>
-        <input type="number" id="node-input-nodeId" style="width:200px; display:inline-block" max="126" min="1"> 
+        <input type="number" id="node-input-nodeId" style="width:200px; display:inline-block" max="126" min="1">
     </div>
 
 	 <div class="mcan-labelInpSel">
