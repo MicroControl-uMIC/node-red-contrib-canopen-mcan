@@ -44,6 +44,7 @@ module.exports = function(RED) {
             const node = this;
             node.on('close' , node.close);
 
+
             //---------------------------------------------------------------------------
             // this is neccassary to store objects within node to access it in other
             // functions
@@ -201,7 +202,7 @@ module.exports = function(RED) {
                         node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Undefined"});
                         break;
                 }
-            }
+            };
         }
 
 

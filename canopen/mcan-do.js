@@ -1,5 +1,7 @@
 /*jshint esversion: 6 */
+
 'use strict';
+
 //-----------------------------------------------------------------------------------------------------//
 // for detailed information: https://nodered.org/docs/creating-nodes/node-js                           //
 //-----------------------------------------------------------------------------------------------------//
@@ -9,164 +11,235 @@
 //-----------------------------------------------------------------------------------------------------
 
 
-const DeviceIdString  = require("./core/id_string");
-const WsComet = require("./core/websocket_comet.js");
-const NodeData  = require("./core/node_data.js");
-const NodeErrorEnum	  = require("./core/node_error.js");
+const deviceIdString  = require("./core/id_string");
+const socketComet     = require("./core/websocket_comet.js");
+const nodeData        = require("./core/node_data.js");
+const nodeErrorEnum   = require("./core/node_error.js");
+
 
 const moduledeviceType     = 197009;
 const moduleProductCode    = 1286014;
 const moduleRevisionNumber = 2;
 
 
-
 //-----------------------------------------------------------------------------------------------------
-// define variables here
+// Definition of McanDoNode
 //-----------------------------------------------------------------------------------------------------
 
 module.exports = function(RED) {
 
-    class MCANDo
+    //---------------------------------------------------------------------------------------------
+    // Definition of class 'McanDoNode'
+    //
+    class McanDoNode
     {
-		constructor(config)
-	    {
-	        RED.nodes.createNode(this,config);
+        //------------------------------------------------------------------------------------
+        // Constructor
+        // runs when flow is deployed
+        //
+        constructor(config)
+        {
+            RED.nodes.createNode(this,config);
 
-	        //---------------------------------------------------------------------------------------------
-	        // runs when flow is deployed
-	        //---------------------------------------------------------------------------------------------
-	        const node = this;
-	        node.on('close', node.close);
-			node.on('input', node.input);
+            const node = this;
+            node.on('close', node.close);
+            node.on('input', node.input);
 
-			//this is neccassary to store objects within node to access it in other functions
-			const context = node.context();
+            //---------------------------------------------------------------------------
+            // this is neccassary to store objects within node to access it in other
+            // functions
+            //
+            const context = node.context();
 
-	        const nodeId 		= config.nodeId;
-	        const canBus 		= config.canBus;
-	        const moduleChannel 	= config.moduleChannel;
+            const canBus        = config.canBus;
+            const nodeId        = config.nodeId;
+            const moduleChannel = config.moduleChannel;
 
-	        //create Buffer for rcv Data
-			var doData = new NodeData();
 
-	        //creat id String
-	        var identification = new DeviceIdString(canBus, nodeId, moduleChannel,
-					14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
+            //---------------------------------------------------------------------------
+            // status of communication unknown
+            //
+            let statusValue   = nodeErrorEnum.eNODE_ERR_UNKOWN;
 
-	        //add specific string
-	        var idString = identification.getIdString();
-	        idString = idString + "port-direction: 1"+ ";" +
-			"error-mode: 0"+ ";" +
-			"error-value: 0"+ ";";
+            //---------------------------------------------------------------------------
+            // open socket
+            //
+            const socket = new socketComet(canBus, nodeId, moduleChannel);
 
-	        //open socket
-	        const doSocket = new WsComet(canBus, nodeId, moduleChannel);
+            //---------------------------------------------------------------------------
+            // create buffer for socket data
+            //
+            var outputData = new nodeData();
 
-			const client = doSocket.connect_ws();
+            //---------------------------------------------------------------------------
+            // create id string
+            //
+            let identification = new deviceIdString(canBus, nodeId, moduleChannel,
+                                                    14,
+                                                    moduleProductCode,
+                                                    moduleRevisionNumber,
+                                                    moduledeviceType);
 
-			//store the client in the context of node
-			context.set('client', client);
-			context.set('node', node);
 
-			client.onopen = function()
-			{
-				//send identification string upon socket connection
-	    	    console.log(idString);
-				client.send(idString);
-			};
+            //---------------------------------------------------------------------------
+            // add module specific string
+            //
+            let idString = identification.getIdString();
+            idString = idString + "port-direction: 1"+ ";" +
+                                  "error-mode: 0"    + ";" +
+                                  "error-value: 0"   + ";";
 
-	    	client.onclose = function()
-	    	{
-	    	    console.log('echo-protocol Client Closed');
-                // fix this -> NO MORE getChannelUrl
-	    	    //node.status({fill:"red",shape:"dot",text: "[Out "+doSocket.getChannelUrl()+"] Not connected"});
-	    	};
+            //---------------------------------------------------------------------------
+            // setup client connection
+            //
+            const client = socket.connect_ws();
 
-	        //gets executed when socket receives a message
-	    	client.onmessage = function (event)
-	    	{
-				doData.setBuffer(event.data, 32);
 
-	                //check Status Variable
-	                if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_NONE)
-	            	{
-	                	node.status({fill:"green",shape:"dot",text: "[Out "+moduleChannel+"] OK"});
-	            	}
-	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
-	            	{
-	                	node.status({fill:"yellow",shape:"dot",text: "[Out "+moduleChannel+"] Error"});
-	            	}
-	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_COMMUNICATION)
-	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[Out "+moduleChannel+"] Error"});
-	            	}
-	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION)
-	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[Out "+moduleChannel+"] Not connected"});
-	            	}
-	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK)
-	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[Out "+moduleChannel+"] Wrong Network"});
-	            	}
-	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_DEVICE)
-	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[Out "+moduleChannel+"] Wrong Node-ID"});
-	            	}
-	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_CONNECTION_CHANNEL)
-	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[Out "+moduleChannel+"] Wrong Channel"});
-	            	}
-	                else if(doData.getValue(1) === NodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION)
-	            	{
-	                	node.status({fill:"red",shape:"dot",text: "[Out "+moduleChannel+"] Wrong device identification"});
-	            	}
+            //---------------------------------------------------------------------------
+            // keep the context
+            //
+            context.set('client', client);
+            context.set('node'  , node);
 
-	    		};
-	    }
+            //---------------------------------------------------------------------------
+            // send identification string upon socket connection
+            //
+            client.onopen = function()
+            {
+                client.send(idString);
+            };
 
+            //---------------------------------------------------------------------------
+            // gets executed when the socket is closed
+            //
+            client.onclose = function()
+            {
+                statusValue = nodeErrorEnum.eNODE_ERR_CONNECTION;
+                node.update(moduleChannel, statusValue);
+            };
+
+            //---------------------------------------------------------------------------
+            // gets executed when socket receives a message
+            //
+            client.onmessage = function (event)
+            {
+                outputData.setBuffer(event.data, 32);
+
+                //-------------------------------------------------------------------
+                // check communication status
+                //
+                if (statusValue != outputData.getValue(1))
+                {
+                    statusValue = outputData.getValue(1);
+                    node.update(moduleChannel, statusValue);
+                }
+            };
+
+            //---------------------------------------------------------------------------
+            // This method is responsible for updating the node status
+            //
+            node.update = function (channel, status)
+            {
+                switch (status)
+                {
+                    case nodeErrorEnum.eNODE_ERR_NONE:
+                        node.status({fill:"green" , shape:"dot", text: "[Out "+ channel +"] OK"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_SENSOR:
+                        node.status({fill:"yellow", shape:"dot", text: "[Out "+ channel +"] Sensor Error"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_COMMUNICATION:
+                        node.status({fill:"red"   , shape:"dot", text: "[Out "+ channel +"] Communication"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_CONNECTION:
+                        node.status({fill:"red"   , shape:"dot", text: "[Out "+ channel +"] Not connected"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK:
+                        node.status({fill:"red"   , shape:"dot", text: "[Out "+ channel +"] Network invalid"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_CONNECTION_DEVICE:
+                        node.status({fill:"red"   , shape:"dot", text: "[Out "+ channel +"] Node-ID invalid"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_CONNECTION_CHANNEL:
+                        node.status({fill:"red"   , shape:"dot", text: "[Out "+ channel +"] Channel invalid"});
+                        break;
+
+                    case nodeErrorEnum.eNODE_ERR_DEVICE_IDENTIFICATION:
+                        node.status({fill:"red"   , shape:"dot", text: "[Out "+ channel +"] Identification failed"});
+                        break;
+
+                    default:
+                        node.status({fill:"red"   , shape:"dot", text: "[Out "+ channel +"] Undefined"});
+                        break;
+                }
+            };
+
+        }
+
+        //------------------------------------------------------------------------------------
+        // This function is called when the node sends a message
+        //
         input(msg)
         {
-			var inpData = new NodeData();
-			//neccassary to access context storage
-			var context = this.context();
+            var inputData = new NodeData();
 
-			var rcvData = msg.payload;
-			//read context variable
-			const client = context.get('client');
+            //---------------------------------------------------------------------------
+            // neccassary to access context storage
+            //
+            var context = this.context();
 
-			inpData.setBuffer(4,32);
+            var rcvData = msg.payload;
 
-			if(rcvData === true)
-			{
-				inpData.addValue(0,1);
-			}
-			else
-			{
-				inpData.addValue(0,0);
-			}
-			inpData.addValue(1,0);
+            //---------------------------------------------------------------------------
+            // read context variable
+            //
+            const client = context.get('client');
 
-        	client.send(inpData.getBuffer());
+            inputData.setBuffer(4, 32);
+
+            if(rcvData === true)
+            {
+                inputData.addValue(0, 1);
+            }
+            else
+            {
+                inputData.addValue(0, 0);
+            }
+            inputData.addValue(1, 0);
+
+            client.send(inputData.getBuffer());
         }
 
-        //---------------------------------------------------------------------------------------------
-        // runs when node is closed (before deploy, e.g. to tidy up)
-        //---------------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------
+        // This function is called when the node is being stopped, e.g. a new flow
+        // configuration is deployed
+        //
         close()
         {
-			//neccassary to access context storage
-			var context = this.context();
+            //---------------------------------------------------------------------------
+            // neccassary to access context storage
+            //
+            var context = this.context();
 
-			//read context variable
-			const client = context.get('client');
-			const node = context.get('node');
+            //---------------------------------------------------------------------------
+            // read context variable
+            //
+            const client = context.get('client');
 
-			client.close();
-			node.status({fill:"red",shape:"dot",text: "[Out "+this.moduleChannel+"] Not connected"});
+            //---------------------------------------------------------------------------
+            // close client connection
+            //
+            client.close();
 
-        }
+        };
 
     }
 
-    RED.nodes.registerType("mcan-dio out", MCANDo);
+    RED.nodes.registerType("mcan-dio out", McanDoNode);
 }

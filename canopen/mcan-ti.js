@@ -1,7 +1,7 @@
-/*jshint esversion: 6 */ 
+/*jshint esversion: 6 */
 'use strict';
 //-----------------------------------------------------------------------------------------------------//
-// for detailed information: https://nodered.org/docs/creating-nodes/node-js       
+// for detailed information: https://nodered.org/docs/creating-nodes/node-js
 //-----------------------------------------------------------------------------------------------------//
 
 //-----------------------------------------------------------------------------------------------------
@@ -26,13 +26,13 @@ const moduleRevisionNumber = 1;
 //-----------------------------------------------------------------------------------------------------
 
 module.exports = function(RED) {
-	
+
     class MCANTi
     {
-		constructor(config) 
+		constructor(config)
 	    {
 	        RED.nodes.createNode(this,config);
-	       
+
 	       //---------------------------------------------------------------------------------------------
 	       // runs when flow is deployed
 	       //---------------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ module.exports = function(RED) {
            const canBus        = config.canBus;
            const nodeId        = config.nodeId;
 		   const moduleChannel = config.moduleChannel;
-		   const sensorType    = config.sensorType;		     
+		   const sensorType    = config.sensorType;
 		   node.on('close', node.close);
 		   //this is neccassary to store objects within node to access it in other functions
 		   const context = node.context();
@@ -50,13 +50,13 @@ module.exports = function(RED) {
 		   //create Buffer for rcv Data
 		   const tiData = new NodeData();
 		   //creat id String
-		   var identification = new DeviceIdString(canBus, nodeId, moduleChannel, 
-			14, moduleProductCode , moduleRevisionNumber, moduledeviceType); 
+		   var identification = new DeviceIdString(canBus, nodeId, moduleChannel,
+			14, moduleProductCode , moduleRevisionNumber, moduledeviceType);
 
 	        //add specific string
 			var idString = identification.getIdString();
-			idString = idString + "sensor-type: "    + sensorType + ";";			
-      	        
+			idString = idString + "sensor-type: "    + sensorType + ";";
+
 			const client = tiSocket.connect_ws();
 
 	        //store the client in the context of node
@@ -68,15 +68,14 @@ module.exports = function(RED) {
 				console.log(idString);
 				client.send(idString);
 			};
-			
-	    	client.onclose = function() 
+
+	    	client.onclose = function()
 	    	{
-	    	    console.log('echo-protocol Client Closed');
 	    	    node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Not connected"});
 	    	};
-	    	
-	        //gets executed when socket receives a message	
-	    	client.onmessage = function (event) 
+
+	        //gets executed when socket receives a message
+	    	client.onmessage = function (event)
 	    	{
 				tiData.setBuffer(event.data, 32);
 
@@ -89,12 +88,12 @@ module.exports = function(RED) {
 										topic: "mcan4ti/" + moduleChannel};
 
 
-						node.send(msgData);	                	
+						node.send(msgData);
 	            	}
 	                else if(tiData.getValue(1) === NodeErrorEnum.eNODE_ERR_SENROR)
 	            	{
-	                	node.status({fill:"yellow",shape:"dot",text: "[In "+moduleChannel+"] Error"});                	
-	            	}	                
+	                	node.status({fill:"yellow",shape:"dot",text: "[In "+moduleChannel+"] Error"});
+	            	}
 	                else if(tiData.getValue(1) === NodeErrorEnum.eNODE_ERR_COMMUNICATION)
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Error"});
@@ -119,7 +118,7 @@ module.exports = function(RED) {
 	            	{
 	                	node.status({fill:"red",shape:"dot",text: "[In "+moduleChannel+"] Wrong device identification"});
 	            	}
-	                
+
 	    		};
 	    }
 
@@ -140,6 +139,6 @@ module.exports = function(RED) {
 		}
 
     }
-    
+
     RED.nodes.registerType("mcan-ti", MCANTi);
 }
