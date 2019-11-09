@@ -208,7 +208,7 @@ module.exports = function(RED) {
             //
             if (rcvData >= 0 && rcvData <= 1000)
             {
-                inpData.addValue(0, rcvData);
+                inputData.addValue(0, rcvData);
             }
 
             inputData.addValue(1, 0);
