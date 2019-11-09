@@ -187,7 +187,7 @@ module.exports = function(RED) {
         //
         input(msg)
         {
-            var inputData = new NodeData();
+            var inputData = new nodeData();
 
             //---------------------------------------------------------------------------
             // neccassary to access context storage
@@ -206,7 +206,7 @@ module.exports = function(RED) {
             //---------------------------------------------------------------------------
             // make sure that only values in the range from 0 .. 1000 can pass
             //
-            if (rcvData >= 0 || rcvData <= 1000)
+            if (rcvData >= 0 && rcvData <= 1000)
             {
                 inpData.addValue(0, rcvData);
             }
