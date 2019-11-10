@@ -136,7 +136,7 @@ module.exports = function(RED) {
 
                 if (statusValue === nodeErrorEnum.eNODE_ERR_NONE)
                 {
-                    let scaledData = inputData.getValue(0) / 10;
+                    let scaledData = inputData.getValue(0) / 1000;
                     let msgData    = {payload: scaledData ,
                                       topic: "mcan-ai/" + moduleChannel};
 

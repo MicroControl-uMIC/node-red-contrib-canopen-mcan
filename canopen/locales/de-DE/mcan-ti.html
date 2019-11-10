@@ -1,26 +1,25 @@
 <!-- Help text, for detailed information: https://nodered.org/docs/creating-nodes/help-style-guide -->
 
 <script type="text/x-red" data-help-name="mcan-ti" lang="de-DE">
-<p>Analoger Eingang eines µCAN.4.ti Moduls</p>
+<p>Liest den Temperatur-Messwert eines CANopen Moduls</p>
 
 <h3>Ausgaben</h3>
     <ol class="node-ports">
         <dl class="message-properties">
-            <dt>payload <span class="property-type">Zahl</span></dt>
-                 <dd>Die Nutzdaten stellen den Temperaturwert am ausgewählten Eingang dar.</dd>
+            <dt>payload <span class="property-type">Number</span></dt>
+                 <dd>Die Nutzdaten repräsentieren den Temperatur-Messwert am ausgewählten Eingang.</dd>
              </dl>
         <dl class="message-properties">
-            <dt>topic <span class="property-type">Zeichenfolge</span></dt>
-                 <dd>Das Topic wird auf <code>mcan4ti/{inputNumber}</code> gesetzt.<br></dd>
+            <dt>topic <span class="property-type">String</span></dt>
+                 <dd>Das Topic wird auf <code>mcan-ti/{inputNumber}</code> gesetzt.<br></dd>
              </dl>
      </ol>
 
 <p>
 <h3>Details</h3>
     <p>
-    Der Knoten generiert eine <code>msg.payload</code> mit dem aktuellen Temperaturwert am ausgewählten Eingang. 
-	Der Knoten generiert jede 100ms einen neuen Messwert.
-	</p>
+        Der Node liest den Temperatur-Messwert am ausgewählten Eingang des CANopen Moduls und schreibt den Wert
+        in <code>msg.payload</code>. Der Node erfasst in Zeitabständen von 100 ms einen neuen Messwert.
+    </p>
 
-    <p>Dieser Knoten bildet ein µCAN.4.ti Modul von MicroControl ab.</p>
 </script>
