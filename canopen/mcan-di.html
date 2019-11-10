@@ -6,11 +6,10 @@
         color: '#FFCC66',
         defaults: {
             name: {value:""},
-            nodeId: {value: ""},
-            productCode: {value: "12.86.014"},
-            sensorType: {value: "input"},
-            moduleChannel: {value: ""},
             canBus: {value: ""},
+            nodeId: {value: ""},
+            moduleChannel: {value: ""},
+            productCode: {value: "12.86.014"},
             deviceName: {value: "µCAN.8.dio"}
         },
         oneditprepare: function() {
@@ -33,7 +32,7 @@
 
     <div class="form-row">
         <label for="node-input-name"> <span data-i18n="mcan-di.labelName"></span> </label>
-        <input type="text" id="node-input-deviceName" style="width:200px; display:inline-block">
+        <input type="text" id="node-input-name" style="width:200px; display:inline-block">
     </div>
 
 
