@@ -187,7 +187,7 @@ module.exports = function(RED) {
         //
         input(msg)
         {
-            let inputData = new NodeData();
+            let inputData = new nodeData();
 
             //---------------------------------------------------------------------------
             // neccassary to access context storage
