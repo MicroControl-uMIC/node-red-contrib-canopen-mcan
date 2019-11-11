@@ -68,7 +68,7 @@ module.exports = function(RED) {
             //---------------------------------------------------------------------------
             // create buffer for socket data
             //
-            var inputData = new nodeData();
+            let inputData = new nodeData();
 
             //---------------------------------------------------------------------------
             // create id string
@@ -188,7 +188,7 @@ module.exports = function(RED) {
                         node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Undefined"});
                         break;
                 }
-            }
+            };
 
         }
 
@@ -201,7 +201,7 @@ module.exports = function(RED) {
             //---------------------------------------------------------------------------
             // neccassary to access context storage
             //
-            var context = this.context();
+            let context = this.context();
 
             //---------------------------------------------------------------------------
             // read context variable

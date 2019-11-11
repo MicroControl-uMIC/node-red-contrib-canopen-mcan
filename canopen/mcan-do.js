@@ -187,14 +187,14 @@ module.exports = function(RED) {
         //
         input(msg)
         {
-            var inputData = new NodeData();
+            let inputData = new NodeData();
 
             //---------------------------------------------------------------------------
             // neccassary to access context storage
             //
-            var context = this.context();
+            let context = this.context();
 
-            var rcvData = msg.payload;
+            let rcvData = msg.payload;
 
             //---------------------------------------------------------------------------
             // read context variable
@@ -225,7 +225,7 @@ module.exports = function(RED) {
             //---------------------------------------------------------------------------
             // neccassary to access context storage
             //
-            var context = this.context();
+            let context = this.context();
 
             //---------------------------------------------------------------------------
             // read context variable
@@ -237,7 +237,7 @@ module.exports = function(RED) {
             //
             client.close();
 
-        };
+        }
 
     }
 
