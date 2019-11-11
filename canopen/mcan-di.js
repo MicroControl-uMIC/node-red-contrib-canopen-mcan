@@ -116,8 +116,6 @@ module.exports = function(RED) {
             //
             client.onclose = function()
             {
-                statusValue = nodeErrorEnum.eNODE_ERR_CONNECTION;
-                node.update(moduleChannel, statusValue);
             };
 
             //---------------------------------------------------------------------------
@@ -176,10 +174,6 @@ module.exports = function(RED) {
 
                     case nodeErrorEnum.eNODE_ERR_COMMUNICATION:
                         node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Communication"});
-                        break;
-
-                    case nodeErrorEnum.eNODE_ERR_CONNECTION:
-                        node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Not connected"});
                         break;
 
                     case nodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK:
