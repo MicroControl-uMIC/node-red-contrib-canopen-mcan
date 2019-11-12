@@ -59,7 +59,7 @@ module.exports = function(RED) {
             //---------------------------------------------------------------------------
             // set default input state
             //
-            let inputState;
+            let inputState = false;
 
             //---------------------------------------------------------------------------
             // status of communication unknown
