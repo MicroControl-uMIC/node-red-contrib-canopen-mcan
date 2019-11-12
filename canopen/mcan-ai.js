@@ -110,8 +110,6 @@ module.exports = function(RED) {
             //
             client.onclose = function()
             {
-                statusValue = nodeErrorEnum.eNODE_ERR_CONNECTION;
-                node.update(moduleChannel, statusValue);
             };
 
             //---------------------------------------------------------------------------
