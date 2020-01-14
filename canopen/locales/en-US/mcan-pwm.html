@@ -7,18 +7,11 @@
     <ol class="node-ports">
         <dl class="message-properties">
             <dt>payload <span class="property-type">Boolean</span></dt>
-                 <dd>Zum Steuern des Ausgangs werden die Werte <code>true</code> oder 
-                     <code>false</code> akzeptiert.</dd>
+                 <dd>To control the output a Message with a <code>Number</code> within 0 .. 100 range are accepted.</dd>
         </dl>
      </ol>
 
 <p>
 <h3>Details</h3>
-Der Knoten akzeptiert eine <code>msg.payload</code> mit einem <code>Boolean</code> Wert. Der 
-Wert <code>true</code> schaltet den Ausgang ein, der Wert <code>false</code> schaltet den
-Ausgang aus.
-<p>
-Der aktuelle Zustand des Ausgangs kann über einen digitalen Eingangsknoten vom Typ
-<code>mcan 8dio in</code> überwacht werden. 
-    <p>Dieser Knoten bildet ein µCAN.8.pwm Modul von MicroControl ab.</p>
+    The Node accepts a <code>msg.payload</code> with a Value between 0 (output disabled) and 100 (output enabled).
 </script>

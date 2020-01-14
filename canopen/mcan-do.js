@@ -152,10 +152,6 @@ module.exports = function(RED) {
                         node.status({fill:"red"   , shape:"dot", text: "[Out "+ channel +"] Communication"});
                         break;
 
-                    case nodeErrorEnum.eNODE_ERR_CONNECTION:
-                        node.status({fill:"red"   , shape:"dot", text: "[Out "+ channel +"] Not connected"});
-                        break;
-
                     case nodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK:
                         node.status({fill:"red"   , shape:"dot", text: "[Out "+ channel +"] Network invalid"});
                         break;

@@ -59,7 +59,7 @@ module.exports = function(RED) {
             //---------------------------------------------------------------------------
             // set default input state
             //
-            let inputState;
+            let inputState = false;
 
             //---------------------------------------------------------------------------
             // status of communication unknown
@@ -174,10 +174,6 @@ module.exports = function(RED) {
 
                     case nodeErrorEnum.eNODE_ERR_COMMUNICATION:
                         node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Communication"});
-                        break;
-
-                    case nodeErrorEnum.eNODE_ERR_CONNECTION:
-                        node.status({fill:"red"   , shape:"dot", text: "[In "+ channel +"] Not connected"});
                         break;
 
                     case nodeErrorEnum.eNODE_ERR_CONNECTION_NETWORK:
