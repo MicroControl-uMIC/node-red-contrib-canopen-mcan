@@ -18,7 +18,7 @@ const nodeErrorEnum   = require("./core/node_error.js");
 
 
 const moduledeviceType     = 131476;
-const moduleProductCode    = 1244001;
+    //= 1245001;
 const moduleRevisionNumber = 50463754;
 
 
@@ -54,6 +54,18 @@ module.exports = function(RED) {
             const nodeId        = config.nodeId;
             const moduleChannel = config.moduleChannel;
             const sensorType    = config.sensorType;
+            var moduleProductCode;
+            //---------------------------------------------------------------------------
+            // setup right product code
+            //
+            if(sensorType === 42)
+            {
+               moduleProductCode    = 1245001;
+            }
+            else if(sensorType === 51)
+            {
+               moduleProductCode    = 1244001;
+            }
 
             //---------------------------------------------------------------------------
             // status of communication unknown
