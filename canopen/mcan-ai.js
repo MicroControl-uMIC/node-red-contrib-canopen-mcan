@@ -58,13 +58,14 @@ module.exports = function(RED) {
             //---------------------------------------------------------------------------
             // setup right product code
             //
-            if(sensorType === 42)
+            if (sensorType === '42')
             {
-               moduleProductCode    = 1245001;
+               moduleProductCode    = 1244001;      // voltage
             }
-            else if(sensorType === 51)
+
+            if(sensorType === '52')
             {
-               moduleProductCode    = 1244001;
+               moduleProductCode    = 1245001;      // current
             }
 
             //---------------------------------------------------------------------------
@@ -160,6 +161,7 @@ module.exports = function(RED) {
             //
             node.update = function (channel, status)
             {
+                console.log("Update", channel, status);
                 switch (status)
                 {
                     case nodeErrorEnum.eNODE_ERR_NONE:
